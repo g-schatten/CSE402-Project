@@ -1,0 +1,26 @@
+The SIR (Susceptible--Infectious--Recovered) model is the canonical compartmental description of an
+epidemic, and fitting it to case data is a standard tool for estimating a pathogen's transmission
+rate $\beta$ and recovery rate $\gamma$, and hence its basic reproduction number $R_0 = \beta/\gamma$.
+Capaldi et al.~\cite{capaldi2012} study parameter estimation and uncertainty quantification for this
+model in detail: least-squares fitting, sensitivity of the estimates to $\beta$--$\gamma$ correlation,
+and the effect of sampling frequency. Like most work in this area, they treat the numerical
+integration of the ODE system as a solved problem -- a black box that produces ``the'' model
+trajectory, with no further scrutiny of \emph{how} it is produced.
+
+We ask the question that black box leaves closed: \emph{does the choice and accuracy of the ODE
+solver materially affect the parameters recovered from it}, once realistic imperfections --
+observation noise, sparse sampling, an incompletely observed epidemic -- are introduced? We answer
+it by implementing every solver ourselves (Forward Euler, Heun, classical RK4, adaptive
+Dormand--Prince RK45, and two implicit methods), building an estimation pipeline around them with
+hand-written optimizers, and running a controlled factorial experiment that isolates solver
+truncation error from every other source of error in the pipeline.
+
+Our central methodological device is a \emph{semi-analytic gold standard}: the SIR system admits an
+exact reduction to a single quadrature (Section~\ref{sec:methods}), so we can measure every solver's
+error against the true solution to machine precision, rather than against ``a finer numerical
+solve'' -- which would be circular. This lets us make a quantitative claim that a black-box
+treatment cannot: there is a \emph{crossover noise level} $\sigma^*$ at which solver-induced
+estimation bias equals noise-induced estimation variance. Below $\sigma^*$, solver accuracy is the
+dominant source of error in the recovered parameters, and using Forward Euler at a coarse step is
+scientifically indefensible. Above $\sigma^*$, sampling noise dominates and a cheaper, less accurate
+solver is statistically indistinguishable from a more expensive one.

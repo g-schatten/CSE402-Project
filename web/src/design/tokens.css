@@ -1,0 +1,139 @@
+/* Design tokens (PLAN.md section 6.2): one set of CSS custom properties
+   driving both themes, one modular type scale, one geometric sans for UI,
+   one mono for numbers. Semantic colors are fixed globally: one per
+   compartment (S/E/I/R/V) and one per solver (Euler/Heun/RK4/RK45/BE),
+   used consistently across every page and every chart. */
+
+:root {
+  color-scheme: dark;
+
+  /* --- surfaces --- */
+  --bg: #0a0e14;
+  --bg-raised: #10161f;
+  --bg-overlay: #161d29;
+  --border: #232b38;
+  --border-strong: #333f52;
+
+  /* --- text --- */
+  --text-primary: #e8edf4;
+  --text-secondary: #96a3b8;
+  --text-tertiary: #5c6b81;
+
+  /* --- accent / brand --- */
+  --accent: #4da3ff;
+  --accent-strong: #7cc0ff;
+  --accent-dim: #1c3a5e;
+
+  /* --- semantic status --- */
+  --good: #3ecf8e;
+  --warn: #f2b84b;
+  --bad: #ef5f6d;
+
+  /* --- compartments (fixed globally, every page, every chart) --- */
+  --c-S: #4da3ff; /* susceptible: blue */
+  --c-E: #b98af2; /* exposed: violet */
+  --c-I: #ef5f6d; /* infectious: red */
+  --c-R: #3ecf8e; /* recovered: green */
+  --c-V: #f2b84b; /* vaccinated: amber */
+
+  /* --- solvers (fixed globally) --- */
+  --solver-euler: #ef5f6d;
+  --solver-heun: #f2b84b;
+  --solver-rk4: #3ecf8e;
+  --solver-rk45: #4da3ff;
+  --solver-backward_euler: #b98af2;
+  --solver-trapezoidal: #58d3d8;
+
+  /* --- type --- */
+  --font-ui: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
+
+  --fs-xs: 0.72rem;
+  --fs-sm: 0.85rem;
+  --fs-base: 1rem;
+  --fs-md: 1.25rem;
+  --fs-lg: 1.563rem;
+  --fs-xl: 1.953rem;
+  --fs-2xl: 2.441rem;
+  --fs-3xl: 3.052rem;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg: #f7f9fc;
+    --bg-raised: #ffffff;
+    --bg-overlay: #eef1f6;
+    --border: #dde3ec;
+    --border-strong: #c3cddc;
+    --text-primary: #131a24;
+    --text-secondary: #4d5b70;
+    --text-tertiary: #7c8aa0;
+    --accent-dim: #dceaff;
+    --shadow-card: 0 1px 2px rgba(20, 30, 50, 0.06), 0 8px 24px rgba(20, 30, 50, 0.08);
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f7f9fc;
+  --bg-raised: #ffffff;
+  --bg-overlay: #eef1f6;
+  --border: #dde3ec;
+  --border-strong: #c3cddc;
+  --text-primary: #131a24;
+  --text-secondary: #4d5b70;
+  --text-tertiary: #7c8aa0;
+  --accent-dim: #dceaff;
+  --shadow-card: 0 1px 2px rgba(20, 30, 50, 0.06), 0 8px 24px rgba(20, 30, 50, 0.08);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mono,
+.tabular-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--accent-dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

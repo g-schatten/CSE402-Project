@@ -1,0 +1,17 @@
+\textbf{Profile scale.} The numbers reported here use our \texttt{quick} experiment profile
+(Section~\ref{sec:appendix-profiles}), with smaller replicate counts and coarser factor grids than
+the full design in our project plan; point estimates of bias and RMSE therefore carry more Monte
+Carlo noise than the full run would, though the qualitative orderings (Figure~\ref{fig:e07}'s
+convergence-order scaling in particular) are already extremely clean at this scale.
+
+\textbf{Synthetic-data circularity.} Our core claims use data generated from the same SIR model
+being fit, which is the correct design for isolating solver effects but cannot by itself show the
+model is a good description of any particular real outbreak.
+
+\textbf{Real-data provenance.} The Eyam dataset (E14) was digitized from commonly-reproduced
+teaching tables rather than transcribed directly from the primary source in this work; see
+\texttt{data/raw/provenance.md}.
+
+\textbf{Single base model family.} While we test SEIR, SIRS, and SIR-with-vaccination (E12), all
+four are still relatively low-dimensional, non-stiff systems; whether the crossover phenomenon's
+specific numerical values generalize to higher-dimensional or stiffer epidemic models is untested.

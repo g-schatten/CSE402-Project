@@ -1,0 +1,28 @@
+# E11: Uncertainty quantification (PLAN.md section 5)
+model: SIR
+n_total: 1000.0
+i0: 1.0
+theta_true: {beta: 0.3, gamma: 0.1}
+solver: rk4
+h: 0.1
+dt: 1.0
+t_obs_final: 60.0
+sigma_frac: 0.05
+n_bootstrap:
+  quick: 60
+  full: 1000
+n_montecarlo:
+  quick: 60
+  full: 500
+mcmc:
+  n_chains: 4
+  n_samples: {quick: 200, full: 8000}
+  burn_in: {quick: 150, full: 3000}
+  prop_scale: [0.02, 0.02]
+profile_grid_n:
+  quick: 15
+  full: 80
+# Second scenario: window truncated before the epidemic peak, to show the
+# identifiability collapse (flat profile likelihood) mentioned in PLAN.md.
+truncated_window_frac: 0.3
+seed: 11

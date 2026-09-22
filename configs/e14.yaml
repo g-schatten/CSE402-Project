@@ -1,0 +1,8 @@
+# E14: Real data (PLAN.md section 5) -- optional, time-permitting extension.
+data_file: eyam_1666.csv
+n_total: 261.0
+i0: 7.0
+solvers: [rk4, euler]
+h: 0.1
+theta0: {beta: 0.5, gamma: 0.3}
+seed: 14

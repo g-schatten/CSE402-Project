@@ -1,0 +1,15 @@
+# E06: Optimizer shoot-out (PLAN.md section 5)
+model: SIR
+n_total: 1000.0
+i0: 1.0
+theta_true: {beta: 0.3, gamma: 0.1}
+t_obs_final: 60.0
+n_obs: 30
+solver: rk4
+h: 0.1
+noise_sigma_frac: 0.05
+n_starts:
+  quick: 8
+  full: 20
+bounds: {beta: [0.05, 1.0], gamma: [0.02, 0.5]}
+seed: 6

@@ -1,0 +1,37 @@
+# E07: Solver-in-the-loop recovery (PLAN.md section 5) -- the centrepiece.
+# Full factorial: solver x h x sigma x dt x (beta,gamma) x replicates.
+# The "full" sizing here matches PLAN.md's ~1.9M-fit design intent; it is
+# meant to be run offline/overnight (`make experiments PROFILE=full`), not
+# inside an interactive session. "quick" is small enough to actually
+# execute now and still show the qualitative effect.
+model: SIR
+n_total: 1000.0
+i0: 1.0
+t_obs_final: 60.0
+solver_step_sizes:
+  euler: {quick: [0.25, 0.05], full: [0.5, 0.25, 0.1, 0.05, 0.02, 0.01]}
+  heun: {quick: [0.25, 0.05], full: [0.5, 0.25, 0.1, 0.05, 0.02, 0.01]}
+  rk4: {quick: [0.25, 0.05], full: [0.5, 0.25, 0.1, 0.05, 0.02, 0.01]}
+sigma_fracs:
+  quick: [0.0, 0.02, 0.1]
+  full: [0.0, 0.01, 0.02, 0.05, 0.1, 0.2]
+sample_dts:
+  quick: [1.0, 3.0]
+  full: [0.5, 1.0, 2.0, 3.0, 5.0]
+theta_grid:
+  quick: [{beta: 0.3, gamma: 0.1}, {beta: 0.6, gamma: 0.15}]
+  full:
+    - {beta: 0.2, gamma: 0.1}
+    - {beta: 0.3, gamma: 0.1}
+    - {beta: 0.45, gamma: 0.1}
+    - {beta: 0.3, gamma: 0.05}
+    - {beta: 0.3, gamma: 0.2}
+    - {beta: 0.6, gamma: 0.1}
+    - {beta: 0.6, gamma: 0.15}
+    - {beta: 0.15, gamma: 0.1}
+    - {beta: 0.9, gamma: 0.3}
+n_replicates:
+  quick: 10
+  full: 200
+n_jobs: 8
+seed: 7

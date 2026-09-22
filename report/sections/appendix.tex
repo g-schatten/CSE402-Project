@@ -1,0 +1,21 @@
+\section{Experiment profiles}
+\label{sec:appendix-profiles}
+Every experiment config (\texttt{configs/*.yaml}) defines a \texttt{quick} and a \texttt{full}
+profile. \texttt{quick} is sized to run interactively (seconds to a few minutes per experiment);
+\texttt{full} matches the factorial sizes in our original project plan (e.g.\ E07's solver
+$\times$ step size $\times$ noise $\times$ sampling interval $\times$ $(\beta,\gamma)$ $\times$
+200-replicate design) and is intended for an offline/overnight run. Every number in this report
+states which profile produced it.
+
+\section{Reproducibility}
+\texttt{make setup \&\& make experiments \&\& make figures \&\& make report} regenerates this PDF
+and every figure in it from a clean clone, using the seeds recorded in \texttt{results/manifest.json}.
+
+\section{Team contributions}
+\begin{itemize}
+  \item \textbf{Saif Uz Zaman} --- numerics core (models, solvers, linear algebra, gold standard).
+  \item \textbf{Sayaad Muzahid Masfi} --- report, presentation, and project narrative.
+  \item \textbf{Ibtida bin Ahmed} --- estimation and uncertainty quantification.
+  \item \textbf{Sakif Naieb Raiyan} --- web dashboard engineering and TypeScript/Python parity.
+  \item \textbf{Aurchi Chowdhury} --- experiment design, data provenance, and figure generation.
+\end{itemize}

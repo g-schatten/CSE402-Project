@@ -1,0 +1,60 @@
+\documentclass[10pt,twocolumn]{article}
+\usepackage[margin=0.75in,columnsep=0.3in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+
+\title{\vspace{-1em}Numerical Analysis of the SIR Epidemic Model:\\
+Solver Accuracy, Parameter Recovery, and Robustness to Noise}
+\author{
+  Saif Uz Zaman \quad Sayaad Muzahid Masfi \quad Ibtida bin Ahmed \quad Sakif Naieb Raiyan \quad Aurchi Chowdhury \\
+  \small CSE 402: Numerical Analysis, Simulation \& Modeling --- Section B, Group 2
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Parameter estimation for the SIR epidemic model is typically studied with the ODE solver treated
+as a black box. We make solver choice the central experimental variable, implementing Forward
+Euler, Heun's method, classical RK4, adaptive Dormand--Prince RK45, and two implicit methods from
+scratch, and asking how solver accuracy propagates into least-squares-recovered transmission and
+recovery rates ($\beta$, $\gamma$). Using a semi-analytic gold-standard SIR solution (derived from
+the model's exact phase-plane reduction) as ground truth, we show that estimation bias inherits the
+fitting solver's convergence order, and we locate a crossover noise level $\sigma^*$ at which this
+solver-induced bias is exactly matched by noise-induced estimator variance: below $\sigma^*$,
+solver choice dominates the error budget; above it, it is statistically irrelevant. All code,
+experiments, and figures in this report are regenerated from a single reproducible pipeline
+(\texttt{make all}).
+\end{abstract}
+
+\section{Introduction}
+\input{sections/introduction}
+
+\section{Background}
+\input{sections/background}
+
+\section{Methods}
+\input{sections/methods}
+
+\section{Results}
+\input{sections/results}
+
+\section{Discussion}
+\input{sections/discussion}
+
+\section{Threats to Validity}
+\input{sections/threats}
+
+\section{Conclusion}
+\input{sections/conclusion}
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\appendix
+\input{sections/appendix}
+
+\end{document}

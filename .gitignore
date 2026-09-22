@@ -1,0 +1,38 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+core/sirlab.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Node / web
+web/node_modules/
+web/dist/
+web/.vite/
+web/tsconfig.tsbuildinfo
+
+# Generated artifacts (regenerate with `make experiments` / `make figures`)
+results/*.json
+web/public/data/*.json
+figures/*.pdf
+figures/*.svg
+
+# LaTeX build artifacts
+report/*.aux
+report/*.log
+report/*.out
+report/*.bbl
+report/*.blg
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+# keep the compiled report itself (report/main.pdf) tracked
+
+# OS / editor
+.DS_Store
+*.swp
+
+# Local scratch
+/tmp/

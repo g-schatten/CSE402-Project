@@ -1,0 +1,26 @@
+# E12: Model variants (PLAN.md section 5)
+# Does the RQ1/RQ2 solver-accuracy ordering survive a higher-dimensional,
+# possibly stiffer model? SIR is the E01-E11 baseline; SEIR/SIRS/SIR-V are
+# run through the same convergence-order + recovery-bias pipeline.
+n_total: 1000.0
+solvers: [euler, heun, rk4]
+step_sizes:
+  quick: [1.0, 0.5, 0.25, 0.125]
+  full: [2.0, 1.0, 0.5, 0.25, 0.125, 0.0625]
+t_final: 60.0
+variants:
+  - model: SIR
+    i0: 1.0
+    theta: {beta: 0.3, gamma: 0.1}
+  - model: SEIR
+    i0: 1.0
+    e0: 2.0
+    theta: {beta: 0.3, sigma_inc: 0.2, gamma: 0.1}
+  - model: SIRS
+    i0: 1.0
+    theta: {beta: 0.3, gamma: 0.1, xi: 0.02}
+  - model: SIR-V
+    i0: 1.0
+    v0: 0.0
+    theta: {beta: 0.3, gamma: 0.1, nu: 0.01}
+seed: 12

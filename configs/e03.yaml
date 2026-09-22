@@ -1,0 +1,15 @@
+# E03: Stability frontier (PLAN.md section 5)
+model: SIR
+n_total: 1000.0
+i0: 1.0
+t_final: 100.0
+seed: 3
+solvers: [euler, heun, rk4]
+beta_range: [0.05, 1.5]
+gamma_range: [0.05, 1.0]
+grid_n:
+  quick: 15
+  full: 40
+step_sizes:
+  quick: [0.5, 1.0, 2.0, 4.0, 8.0, 16.0]
+  full: [0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 12.0, 16.0, 24.0, 32.0]

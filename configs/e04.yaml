@@ -1,0 +1,10 @@
+# E04: Structural accuracy (PLAN.md section 5)
+model: SIR
+n_total: 1000.0
+i0: 1.0
+theta: {beta: 0.3, gamma: 0.1}
+seed: 4
+solvers: [euler, heun, rk4]
+step_sizes:
+  quick: [2.0, 1.0, 0.5, 0.25]
+  full: [4.0, 2.0, 1.0, 0.5, 0.25, 0.125, 0.0625]

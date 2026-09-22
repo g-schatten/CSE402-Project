@@ -1,0 +1,22 @@
+# E01: Convergence & order (PLAN.md section 5)
+# Solver error/convergence order against the SIR gold standard, swept over
+# solver x step size x three (beta, gamma) regimes.
+model: SIR
+n_total: 1000.0
+i0: 1.0
+t_final: 40.0  # comfortably before the tail singularity
+seed: 1
+
+regimes:
+  - name: "R0=3 (typical)"
+    theta: {beta: 0.3, gamma: 0.1}
+  - name: "R0=1.5 (near-threshold)"
+    theta: {beta: 0.15, gamma: 0.1}
+  - name: "R0=6 (severe)"
+    theta: {beta: 0.6, gamma: 0.1}
+
+solvers: [euler, heun, rk4, backward_euler, trapezoidal]
+
+step_sizes:
+  quick: [1.0, 0.5, 0.25, 0.125]
+  full: [2.0, 1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125]
