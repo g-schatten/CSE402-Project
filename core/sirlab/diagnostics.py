@@ -6,6 +6,8 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
+from sirlab.linalg.eigen import spectral_radius
+
 
 def error_norms(y_approx: NDArray[np.float64], y_true: NDArray[np.float64]) -> dict[str, float]:
     """Global error at the final time, max-over-time (L-infinity), and
@@ -62,11 +64,11 @@ def phase_invariant_drift(s: NDArray[np.float64], r: NDArray[np.float64], beta: 
 
 
 def stability_metric(h: float, jac_y: NDArray[np.float64]) -> float:
-    """max_i h*|Re(lambda_i)| (and |Im| contributes via magnitude) for the
-    eigenvalues of the local Jacobian -- used to test a trajectory point
-    against a solver's stability region."""
-    eigvals = np.linalg.eigvals(jac_y)
-    return float(h * np.max(np.abs(eigvals)))
+    """h * rho(J), rho the largest eigenvalue modulus of the local Jacobian --
+    used to test a trajectory point against a solver's stability region. rho
+    comes from our power method (linalg/eigen.py), which also handles the
+    complex-conjugate eigenvalue pair the SIR Jacobian has near the peak."""
+    return float(h * spectral_radius(jac_y))
 
 
 def work_precision_fevals(n_steps: int, fevals_per_step: int) -> int:

@@ -13,7 +13,9 @@ observation noise, sparse sampling, an incompletely observed epidemic -- are int
 it by implementing every solver ourselves (Forward Euler, Heun, classical RK4, adaptive
 Dormand--Prince RK45, and two implicit methods), building an estimation pipeline around them with
 hand-written optimizers, and running a controlled factorial experiment that isolates solver
-truncation error from every other source of error in the pipeline.
+truncation error from every other source of error in the pipeline. Section~\ref{sec:course} maps
+each method we use to the CSE 402 syllabus, and Section~\ref{sec:rng} documents how the random
+numbers behind our noise, resampling, and MCMC experiments are generated.
 
 Our central methodological device is a \emph{semi-analytic gold standard}: the SIR system admits an
 exact reduction to a single quadrature (Section~\ref{sec:methods}), so we can measure every solver's

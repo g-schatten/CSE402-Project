@@ -2,7 +2,7 @@
 
 \subsection{RQ1: solver behavior}
 Figure~\ref{fig:e01} shows the fitted convergence order for each solver against the gold standard.
-Observed orders match theory closely: Forward Euler $\hat p=1.03$ (theory 1), Heun $\hat p=1.95$
+Observed orders match theory closely: Forward Euler $\hat p=1.03$ (theory 1), Heun $\hat p=1.94$
 (theory 2), classical RK4 $\hat p=3.94$ (theory 4), backward Euler $\hat p=0.97$ (theory 1), and
 trapezoidal $\hat p=2.00$ (theory 2).
 
@@ -28,11 +28,11 @@ correctly separates solver quality.
 Figure~\ref{fig:e07} is the mechanism behind our central claim: with noise-free synthetic data
 (so any deviation from truth is attributable purely to the fitting solver), bias in the recovered
 $\hat\beta$ shrinks with $h$ at each solver's own convergence order. At $(\beta,\gamma)=(0.3,0.1)$,
-halving $h$ from $0.25$ to $0.05$ (a factor of 5) shrinks Euler's bias by a factor of $\approx 5.0$
-($4.48\times10^{-3} \to 8.93\times10^{-4}$), Heun's by $\approx 24.3$
-($5.88\times10^{-5} \to 2.43\times10^{-6}$), and RK4's by $\approx 610$
-($7.17\times10^{-9} \to 1.18\times10^{-11}$) -- matching the theoretical $5^1$, $5^2$, and $5^4$
-scaling almost exactly.
+reducing $h$ from $0.25$ to $0.05$ (a factor of 5) shrinks Euler's bias by a factor of $\approx 5.0$
+($4.48\times10^{-3} \to 8.93\times10^{-4}$), Heun's by $\approx 24.2$
+($5.88\times10^{-5} \to 2.43\times10^{-6}$), and RK4's by $\approx 606$
+($7.17\times10^{-9} \to 1.18\times10^{-11}$) -- close to the theoretical $5^1$, $5^2 = 25$, and
+$5^4 = 625$.
 
 \begin{figure}[t]
   \centering
@@ -54,26 +54,30 @@ $2.9\times10^{-3}$ at $\sigma=0.10$.
   \label{fig:e08}
 \end{figure}
 
-Figure~\ref{fig:e09} shows RMSE$(\hat\beta)$ as the observation window is truncated toward the
-epidemic's early growth phase (E09): observing only the first quarter of the window (well before
-the peak) roughly doubles RMSE relative to observing through the full decline, and coarser sampling
-(larger $dt$) compounds the effect -- direct evidence of the identifiability collapse that motivates
-watching for the peak before trusting a fit. Separately (E10), treating $I_0$ as an unknown 3rd
-parameter rather than a known constant inflates the condition number of the Jacobian by roughly two
-orders of magnitude as $I_0$ grows (from $\approx 211$ at $I_0=1$ to $\approx 1828$ at $I_0=20$) and
-correspondingly inflates the variance of $\hat\beta$ by an order of magnitude or more.
+Figure~\ref{fig:e09} shows RMSE$(\hat\beta)$ as the observation window shrinks from 6 to 1.5 times
+the peak time (E09). With dense sampling, truncation costs little: RMSE rises by 34\% at
+$dt = 0.5$ and 22\% at $dt = 1$. At $dt = 2$ it doubles ($1.5\times10^{-3} \to 3.0\times10^{-3}$),
+so coarse sampling and a short window compound. Every window in this grid still contains the peak;
+cutting the observations off \emph{before} the peak is a far stronger effect
+(Figure~\ref{fig:e11}). Separately (E10), treating $I_0$ as an unknown third parameter rather than
+a known constant raises the condition number of the Jacobian from $\kappa_2 \approx 2.2$--$2.6$ to
+$\approx 211$ at $I_0 = 1$ and $\approx 1828$ at $I_0 = 20$. It inflates the variance of
+$\hat\beta$ by a factor of 19 at $I_0 = 1$ and 13 at $I_0 = 5$, but only 3.5 at $I_0 = 20$
+(10 replicates per cell), so the growth in condition number does not carry over to the variance.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{../figures/e09_sampling_window.pdf}
-  \caption{RMSE grows sharply as the observation window is truncated before the epidemic peak (E09).}
+  \caption{RMSE$(\hat\beta)$ vs.\ observation window (as a fraction of 6 times the peak time) and
+    sampling interval (E09).}
   \label{fig:e09}
 \end{figure}
 
 \subsection{Uncertainty quantification}
 Figure~\ref{fig:e11} overlays all four UQ routes and compares profile likelihoods on the full vs.\
-a pre-peak-truncated observation window; the truncated profile is visibly flatter, the concrete
-signature of the identifiability collapse quantified in Figure~\ref{fig:e09}.
+a window truncated at 0.3 times the peak time. The truncated profile is nearly flat: it varies by
+10\% across the $\beta$ grid, against a 65-fold rise for the full window. This is the signature of
+non-identifiability before the peak.
 
 \begin{figure}[t]
   \centering
@@ -82,15 +86,21 @@ signature of the identifiability collapse quantified in Figure~\ref{fig:e09}.
   \label{fig:e11}
 \end{figure}
 
-\subsection{The crossover $\sigma^*$}
-Figure~\ref{fig:e13} overlays the deterministic solver-bias curve against the noise-induced standard
-deviation curve for Forward Euler at a representative step size; their intersection is the crossover
-$\sigma^*(h)$ described in Section~\ref{sec:methods}.
+\subsection{The crossover \texorpdfstring{$\sigma^*$}{σ*}}
+Figure~\ref{fig:e13} overlays the deterministic solver bias in $\hat\beta$ against the
+noise-induced standard deviation for Forward Euler at $h = 0.1$; they cross at $\sigma^* = 0.058$
+(Section~\ref{sec:methods}). At $h = 0.25$ the bias is 2.5 times larger ($4.48\times10^{-3}$, the
+same value E07 finds) and $\sigma^* = 0.156$, so $\sigma^*$ grows roughly in proportion to $h$: a
+first-order method's bias scales as $h$, while the noise-induced spread grows with $\sigma$. At
+$h = 0.5$ the spread is still below the bias at the largest noise level tested ($\sigma = 0.2$), so
+there $\sigma^* > 0.2$. For $\hat\gamma$ the crossover comes earlier: $\sigma^* = 0.029$, $0.054$,
+and $0.128$ at $h = 0.1$, $0.25$, and $0.5$.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{../figures/e13_crossover.pdf}
-  \caption{Crossover $\sigma^*$: below it, solver bias dominates; above it, noise dominates (E13).}
+  \caption{Crossover for Forward Euler at $h = 0.1$: below $\sigma^* = 0.058$ solver bias dominates
+    the error in $\hat\beta$; above it, noise dominates (E13).}
   \label{fig:e13}
 \end{figure}
 

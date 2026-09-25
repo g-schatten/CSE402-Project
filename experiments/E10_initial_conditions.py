@@ -3,7 +3,8 @@
 Compares two estimation scenarios: (a) I0 known exactly (standard 2-param
 (beta, gamma) fit) vs (b) I0 unknown and estimated as a 3rd parameter
 alongside (beta, gamma). Reports the extra variance incurred by not knowing
-I0, and kappa of the 3-parameter J^T J vs the 2-parameter one.
+I0, and the 2-norm condition number of the 3-parameter J vs the 2-parameter
+one (sirlab.linalg.eigen.cond2: power and inverse power method on J^T J).
 
 Note on method: for the 3-parameter case, S0 = N - I0 depends on the
 parameter being estimated, so the clean forward-sensitivity-equation
@@ -28,6 +29,7 @@ from experiments.common import quick_or_full
 from sirlab.estimate.base import ForwardModel
 from sirlab.estimate.lm import levenberg_marquardt
 from sirlab.estimate.neldermead import nelder_mead
+from sirlab.linalg.eigen import cond2
 from sirlab.models import SIR
 from sirlab.observe import prevalence
 from sirlab.reference import SIRReference
@@ -142,8 +144,8 @@ def run(config: dict) -> dict:
                     "i0": i0,
                     "variance_i0_known": var_known,
                     "variance_i0_unknown": var_unknown,
-                    "cond_2param": float(np.linalg.cond(jac2)),
-                    "cond_3param": float(np.linalg.cond(jac3)),
+                    "cond_2param": cond2(jac2),
+                    "cond_3param": cond2(jac3),
                     "n_converged_known": int(known_oks.sum()),
                     "n_converged_unknown": int(unknown_oks.sum()),
                     "n_total": n_rep,

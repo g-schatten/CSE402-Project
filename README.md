@@ -46,8 +46,9 @@ not an interactive session).
 ## Design principles
 
 - **`core/sirlab` never imports SciPy or matplotlib** (enforced by `tests/test_hygiene.py`). Every
-  solver, optimizer, and root-finder is hand-written; SciPy/NumPy's own routines appear only in
-  tests, as an independent cross-check.
+  solver, optimizer, root-finder, and eigenvalue routine (power method, inverse power method,
+  Hotelling deflation — `core/sirlab/linalg/eigen.py`) is hand-written; SciPy/NumPy's own
+  routines appear only in tests, as an independent cross-check.
 - **The semi-analytic gold standard** (`core/sirlab/reference.py`) gives an SIR trajectory accurate
   to machine precision with no ODE solver in the loop, so every accuracy claim in this project is
   measured against ground truth, not against "a finer numerical solve."

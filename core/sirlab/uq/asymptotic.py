@@ -3,13 +3,16 @@
 Cov(theta_hat) ~= sigma_hat^2 (J^T J)^-1,  sigma_hat^2 = J(theta_hat)/(n-p)
 
 The 95% ellipse is drawn from the eigendecomposition of the covariance
-matrix. This is the cheapest UQ route and the one every other route is
-compared against.
+matrix, computed by our power method with Hotelling deflation
+(linalg/eigen.py). This is the cheapest UQ route and the one every other
+route is compared against.
 """
 from __future__ import annotations
 
 import numpy as np
 from numpy.typing import NDArray
+
+from sirlab.linalg.eigen import symmetric_eigen
 
 
 def confidence_ellipse(cov: NDArray[np.float64], theta_hat: NDArray[np.float64], *, confidence: float = 0.95, n_points: int = 200):
@@ -18,7 +21,7 @@ def confidence_ellipse(cov: NDArray[np.float64], theta_hat: NDArray[np.float64],
     from sirlab.uq._chi2 import chi2_quantile_2df
 
     chi2_val = chi2_quantile_2df(confidence)
-    eigvals, eigvecs = np.linalg.eigh(cov)
+    eigvals, eigvecs = symmetric_eigen(cov)
     eigvals = np.clip(eigvals, 0.0, None)
     angles = np.linspace(0, 2 * np.pi, n_points)
     circle = np.stack([np.cos(angles), np.sin(angles)])

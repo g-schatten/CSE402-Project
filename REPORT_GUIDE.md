@@ -1302,11 +1302,17 @@ A single experiment at paper scale: `make experiment ID=E13 PROFILE=full`.
 
 **Team (from the report appendix).**
 
-- Saif Uz Zaman — numerics core (models, solvers, linear algebra, gold standard).
-- Sayaad Muzahid Masfi — report, presentation, narrative.
-- Ibtida bin Ahmed — estimation and UQ.
-- Sakif Naieb Raiyan — web dashboard and TS/Python parity.
-- Aurchi Chowdhury — experiment design, data provenance, figures.
+- Saif Uz Zaman — numerics core: SIR model and analytic Jacobians, the six solvers with
+  dense output, the gold standard (adaptive Simpson + safeguarded Newton), LU/QR, E01–E04.
+- Sayaad Muzahid Masfi — power method, inverse power method, and Hotelling deflation
+  (`linalg/eigen.py`, used in E03, E05, E10, E11, E14) and their tests; E13 grid redesign;
+  end-to-end runs on Windows and Linux; the report, RQ notebooks, and presentation.
+- Ibtida bin Ahmed — sensitivity equations, observation and noise models, the five
+  optimizers, the four UQ routes and profile likelihood, E05–E11 and E13.
+- Sakif Naieb Raiyan — React/TypeScript dashboard (ten pages, d3-based SVG charts), the
+  TypeScript numerics twin, and the Python/TypeScript parity test.
+- Aurchi Chowdhury — experiment runner, configs, and content-hash manifest; JSON schema and
+  web export; SEIR/SIRS/vaccination variants (E12); Eyam data provenance (E14); figures.
 
 ## Appendix B — Glossary
 

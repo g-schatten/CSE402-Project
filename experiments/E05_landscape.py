@@ -2,14 +2,16 @@
 
 J(beta, gamma) surfaces at several noise levels, plus the valley axis
 (principal axis of curvature at the minimum via eigendecomposition of the
-Hessian approximation J^T J) and kappa(J^T J) -- the concrete
-identifiability picture that E06's optimizers are then raced across.
+Hessian approximation J^T J, by our power method with Hotelling deflation)
+and kappa(J^T J) -- the concrete identifiability picture that E06's
+optimizers are then raced across.
 """
 from __future__ import annotations
 
 import numpy as np
 
 from experiments.common import build_prevalence_forward_model, quick_or_full
+from sirlab.linalg.eigen import symmetric_eigen
 from sirlab.linalg.lu import cond_estimate
 from sirlab.models import SIR
 from sirlab.observe import NoiseModel
@@ -44,7 +46,7 @@ def run(config: dict) -> dict:
                 surf[i2, i1] = fwd.cost(np.array([b, g]), obs)
         jac = fwd.jacobian(theta_true)
         jtj = jac.T @ jac
-        eigvals, eigvecs = np.linalg.eigh(jtj)
+        eigvals, eigvecs = symmetric_eigen(jtj)
         surfaces[str(sigma_frac)] = {
             "surface": surf.tolist(),
             "valley_axis": eigvecs[:, np.argmin(eigvals)].tolist(),

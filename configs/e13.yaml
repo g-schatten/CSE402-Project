@@ -6,11 +6,14 @@ n_total: 1000.0
 i0: 1.0
 theta_true: {beta: 0.3, gamma: 0.1}
 solver: euler   # the solver being compared against an (approximately) exact RK4
+# Euler's bias grows roughly as 0.018 h while the noise std grows as ~0.03 sigma,
+# so sigma*(h) ~ 0.55 h: the quick grid needs small h (and sigma up to 0.2) to
+# bracket the crossover at all -- at h >= 0.5 it lies beyond sigma = 0.2.
 h_values:
-  quick: [0.5, 1.0, 2.0]
+  quick: [0.1, 0.25, 0.5]
   full: [0.1, 0.25, 0.5, 1.0, 1.5, 2.0, 3.0]
 sigma_fracs:
-  quick: [0.0, 0.005, 0.01, 0.02, 0.05, 0.1]
+  quick: [0.0, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2]
   full: [0.0, 0.0025, 0.005, 0.0075, 0.01, 0.015, 0.02, 0.03, 0.05, 0.08, 0.12, 0.2]
 dt: 1.0
 t_obs_final: 60.0

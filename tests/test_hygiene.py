@@ -21,6 +21,19 @@ def test_no_banned_imports_in_core():
     assert not offenders, f"banned imports found: {offenders}"
 
 
+def test_no_numpy_eigensolvers_outside_tests():
+    """Eigenvalues, singular values, and condition numbers come from our
+    power method (linalg/eigen.py); NumPy's versions are for tests only."""
+    pattern = re.compile(r"np\.linalg\.(eig\w*|svd|cond)\b|from numpy\.linalg import")
+    offenders = []
+    for root in (CORE, CORE.parents[1] / "experiments"):
+        for path in root.rglob("*.py"):
+            for lineno, line in enumerate(path.read_text().splitlines(), start=1):
+                if pattern.search(line):
+                    offenders.append(f"{path.relative_to(CORE.parents[1])}:{lineno}")
+    assert not offenders, f"NumPy eigensolver calls found: {offenders}"
+
+
 def test_core_package_importable():
     import sirlab  # noqa: F401
     import sirlab.models  # noqa: F401

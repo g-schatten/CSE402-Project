@@ -171,7 +171,7 @@ def fig_e09_sampling():
         ax.semilogy(wf, rmse, "o-", label=f"dt={dt}")
     ax.set_xlabel("observation window fraction (of ~6x peak time)")
     ax.set_ylabel("RMSE(β̂)")
-    ax.set_title("E09: identifiability collapses before the epidemic peak")
+    ax.set_title("E09: RMSE vs observation window and sampling interval")
     ax.legend()
     save(fig, "e09_sampling_window")
 
