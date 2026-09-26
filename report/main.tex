@@ -1,21 +1,66 @@
-\documentclass[10pt,twocolumn]{article}
-\usepackage[margin=0.75in,columnsep=0.3in]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{graphicx}
+\documentclass[sigconf,screen=true]{acmart}
+
+%% This is a course project report, not a submission to an ACM-sponsored
+%% venue: suppress the ACM reference-format / rights-management boilerplate
+%% that acmart prints by default (fake DOI, ISBN, conference name, ...).
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\acmConference[CSE 402]{CSE 402 Course Project Report}{2026}{BUET, Dhaka, Bangladesh}
+\acmYear{2026}
+\copyrightyear{2026}
+\acmDOI{}
+\acmISBN{}
+
 \usepackage{booktabs}
 \usepackage{tabularx}
-\usepackage[hidelinks]{hyperref}
-
-\title{\vspace{-1em}Numerical Analysis of the SIR Epidemic Model:\\
-Solver Accuracy, Parameter Recovery, and Robustness to Noise}
-\author{
-  Saif Uz Zaman \quad Sayaad Muzahid Masfi \quad Ibtida bin Ahmed \quad Sakif Naieb Raiyan \quad Aurchi Chowdhury \\
-  \small CSE 402: Numerical Analysis, Simulation \& Modeling --- Section B, Group 2
-}
-\date{}
 
 \begin{document}
-\maketitle
+
+\title{Numerical Analysis of the SIR Epidemic Model: Solver Accuracy, Parameter Recovery, and
+Robustness to Noise}
+\subtitle{CSE 402: Numerical Analysis, Simulation \& Modeling --- Section B, Group 2}
+
+\author{Saif Uz Zaman}
+\affiliation{%
+  \institution{Bangladesh University of Engineering and Technology}
+  \department{Dept.\ of CSE --- Section B, Group 2 --- ID 2105088}
+  \city{Dhaka}
+  \country{Bangladesh}
+}
+
+\author{Sayaad Muzahid Masfi}
+\affiliation{%
+  \institution{Bangladesh University of Engineering and Technology}
+  \department{Dept.\ of CSE --- Section B, Group 2 --- ID 2105066}
+  \city{Dhaka}
+  \country{Bangladesh}
+}
+
+\author{Ibtida bin Ahmed}
+\affiliation{%
+  \institution{Bangladesh University of Engineering and Technology}
+  \department{Dept.\ of CSE --- Section B, Group 2 --- ID ?}
+  \city{Dhaka}
+  \country{Bangladesh}
+}
+
+\author{Sakif Naieb Raiyan}
+\affiliation{%
+  \institution{Bangladesh University of Engineering and Technology}
+  \department{Dept.\ of CSE --- Section B, Group 2 --- ID ?}
+  \city{Dhaka}
+  \country{Bangladesh}
+}
+
+\author{Aurchi Chowdhury}
+\affiliation{%
+  \institution{Bangladesh University of Engineering and Technology}
+  \department{Dept.\ of CSE --- Section B, Group 2 --- ID ?}
+  \city{Dhaka}
+  \country{Bangladesh}
+}
+
+\renewcommand{\shortauthors}{Zaman, Masfi, Ahmed, Raiyan, and Chowdhury}
 
 \begin{abstract}
 Parameter estimation for the SIR epidemic model is typically studied with the ODE solver treated
@@ -34,32 +79,38 @@ every random number is generated. All code, experiments, and figures in this rep
 reproducible pipeline (\texttt{make all}).
 \end{abstract}
 
-\section{Introduction}
+\keywords{SIR epidemic model, ODE solvers, parameter estimation, uncertainty quantification, Monte Carlo simulation, numerical analysis}
+
+\maketitle
+
+\section{Introduction and Base Paper Review}
 \input{sections/introduction}
+\input{sections/base_paper}
 
-\section{Background}
-\input{sections/background}
-
-\section{Methods}
+\section{Methodology}
+\label{sec:methods}
+\input{sections/sir_model}
 \input{sections/methods}
-
-\section{CSE 402 Methods Used}
+\subsection{Mapping to the CSE 402 syllabus}
 \input{sections/course_methods}
 
-\section{Results}
+\section{Implementation and Experiments}
+\input{sections/implementation}
+
+\section{Results and Discussion}
 \label{sec:results}
 \input{sections/results}
-
-\section{Discussion}
+\subsection{Discussion}
 \input{sections/discussion}
 
-\section{Threats to Validity}
-\input{sections/threats}
-
-\section{Conclusion}
+\section{Conclusion and Future Work}
 \input{sections/conclusion}
+\subsection{Limitations}
+\label{sec:threats}
+\input{sections/threats}
+\input{sections/futurework}
 
-\bibliographystyle{plain}
+\bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}
 
 \appendix

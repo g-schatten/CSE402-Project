@@ -1,14 +1,3 @@
-\subsection{The SIR model}
-The classical SIR model partitions a closed population of size $N$ into susceptible ($S$),
-infectious ($I$), and recovered ($R$) compartments:
-\begin{align}
-  \frac{dS}{dt} &= -\frac{\beta S I}{N}, &
-  \frac{dI}{dt} &= \frac{\beta S I}{N} - \gamma I, &
-  \frac{dR}{dt} &= \gamma I. \label{eq:sir}
-\end{align}
-The basic reproduction number is $R_0 = \beta/\gamma$: an epidemic grows while $R_0 \cdot S(t)/N > 1$
-and declines once susceptible depletion pushes it below 1.
-
 \subsection{Base paper and our extension}
 Capaldi et al.~\cite{capaldi2012} fit \eqref{eq:sir} to synthetic and real incidence data via
 least squares, quantify the uncertainty in the resulting $(\hat\beta,\hat\gamma)$ via an asymptotic

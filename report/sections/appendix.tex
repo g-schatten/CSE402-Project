@@ -10,19 +10,21 @@ states which profile produced it.
 \section{Reproducibility}
 \texttt{make setup \&\& make experiments \&\& make figures \&\& make report} regenerates this PDF
 and every figure in it from a clean clone, using the seeds recorded in \texttt{results/manifest.json}
-and the per-replicate seed derivation of Section~\ref{sec:rng}.
+and the per-replicate seed derivation of Section~\ref{sec:rng}. The full source, including every
+experiment config, the test suite, and the web dashboard, is at
+\url{https://github.com/g-schatten/CSE402-Project}.
 
 \section{Team contributions}
 Each member owned one part of the pipeline and wrote the unit tests for it.
 \begin{itemize}
-  \item \textbf{Saif Uz Zaman} --- numerics core. Built the SIR model with analytic Jacobians
+  \item \textbf{Saif Uz Zaman (ID 2105088)} --- numerics core. Built the SIR model with analytic Jacobians
     $J_y f$ and $\partial f/\partial\theta$, checked against complex-step derivatives; the six
     solvers (Euler, Heun, RK4, Dormand--Prince RK45 with PI step control, and backward Euler and
     trapezoidal with a Newton solve per step) with cubic Hermite dense output; and the
     semi-analytic gold standard, which evaluates $t(R)$ by adaptive Simpson and inverts it by
     safeguarded Newton. Wrote the LU and Householder QR routines and the solver experiments
     E01--E04 (convergence order, invariant drift, stability frontier, peak accuracy).
-  \item \textbf{Sayaad Muzahid Masfi} --- eigenvalue code, integration testing, and the report.
+  \item \textbf{Sayaad Muzahid Masfi (ID 2105066)} --- eigenvalue code, integration testing, and the report.
     Implemented the power method, the inverse power method (one LU factorization, reused every
     iteration), and Hotelling deflation from the course lecture, together with the 2-D projection
     that recovers the complex eigenvalue pair of the SIR Jacobian at the peak
@@ -33,7 +35,7 @@ Each member owned one part of the pipeline and wrote the unit tests for it.
     results agree to rounding error), and checked every number in the report against the
     regenerated results. Wrote the report, including the random-number and course-mapping
     sections, the four RQ notebooks, and the presentation.
-  \item \textbf{Ibtida bin Ahmed} --- estimation and uncertainty quantification. Built the
+  \item \textbf{Ibtida bin Ahmed (ID~?)} --- estimation and uncertainty quantification. Built the
     forward sensitivity equations, integrated by the same solver as the trajectory so that solver
     error enters the Jacobian exactly as it enters the state; the observation operators and four
     noise models; and the five optimizers (Gauss--Newton with a backtracking line search,
@@ -42,14 +44,14 @@ Each member owned one part of the pipeline and wrote the unit tests for it.
     confidence ellipse, residual bootstrap, Monte Carlo, adaptive Metropolis MCMC with $\hat R$
     and ESS, and the profile likelihood. Ran E05--E11 and E13, with per-replicate seeds so the
     parallel replicates are reproducible.
-  \item \textbf{Sakif Naieb Raiyan} --- web dashboard. Built the React/TypeScript dashboard: ten
+  \item \textbf{Sakif Naieb Raiyan (ID~?)} --- web dashboard. Built the React/TypeScript dashboard: ten
     pages from the Model Lab and Solver Arena to the Crossover and Real Data views, an SVG chart
     component on d3 scales (log axes, hover readout, scatter mode for sample clouds), KaTeX
     equations, and light and dark themes. Wrote the TypeScript twin of the models, solvers, and
     gold standard, with the same operation order as the Python code, and the parity test that
     checks it against Python-generated fixtures: solver states to $10^{-9}$ and the gold
     standard to $10^{-6}$.
-  \item \textbf{Aurchi Chowdhury} --- experiment infrastructure, model variants, and real data.
+  \item \textbf{Aurchi Chowdhury (ID~?)} --- experiment infrastructure, model variants, and real data.
     Built the experiment runner and registry, the YAML configs with \texttt{quick} and
     \texttt{full} profiles, and the manifest that records each run's config hash, git SHA, seed,
     and host, and skips a rerun when the config hash is unchanged. Defined the JSON result schema

@@ -1,0 +1,513 @@
+<title>SIR Solver Defense</title>
+<meta name="description" content="6-slide defense deck for the CSE 402 SIR project: the crossover finding, the method, and the results.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light;
+    --bg: #eef1f6;
+    --paper: #f7f8fa;
+    --surface: #ffffff;
+    --ink: #131a24;
+    --ink-soft: #4d5b70;
+    --ink-faint: #7c8aa0;
+    --line: #dde3ec;
+    --line-strong: #c7cee0;
+    --edge: #333f52;
+    --s-blue: #2f7fd6;
+    --i-red: #d43f4e;
+    --r-green: #22a06b;
+    --amber: #c98a1f;
+    --purple: #8a5fc9;
+    --teal: #1f9aa0;
+    --accent: var(--i-red);
+    --shadow: 0 1px 2px rgba(19,26,36,.06), 0 12px 32px -16px rgba(19,26,36,.22);
+    --font-display: 'Fraunces', Georgia, 'Iowan Old Style', serif;
+    --font-body: 'IBM Plex Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --bg: #0e1218;
+      --paper: #151a22;
+      --surface: #1a212b;
+      --ink: #eef1f6;
+      --ink-soft: #a9b4c6;
+      --ink-faint: #7484a0;
+      --line: #29323f;
+      --line-strong: #38445466;
+      --edge: #8a97ad;
+      --s-blue: #6ea6ea;
+      --i-red: #ec6b78;
+      --r-green: #57c493;
+      --amber: #e0ad57;
+      --purple: #ac8ce0;
+      --teal: #4fc2c9;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 20px 48px -20px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg: #0e1218;
+    --paper: #151a22;
+    --surface: #1a212b;
+    --ink: #eef1f6;
+    --ink-soft: #a9b4c6;
+    --ink-faint: #7484a0;
+    --line: #29323f;
+    --line-strong: #38445466;
+    --edge: #8a97ad;
+    --s-blue: #6ea6ea;
+    --i-red: #ec6b78;
+    --r-green: #57c493;
+    --amber: #e0ad57;
+    --purple: #ac8ce0;
+    --teal: #4fc2c9;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 20px 48px -20px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  .deck{
+    position:relative;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-inline: 16px;
+    padding-block: 14px 84px;
+  }
+  .track{
+    position:relative;
+    aspect-ratio: 16/9;
+    width:100%;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  @media (max-width: 620px){
+    .track{ aspect-ratio: auto; min-height: 640px; }
+  }
+  .slide{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    padding: clamp(20px,3.4vw,44px) clamp(22px,4.2vw,56px);
+    opacity:0; visibility:hidden;
+    transform: translateY(10px);
+    transition: opacity .38s ease, transform .38s ease;
+  }
+  .slide.active{ opacity:1; visibility:visible; transform:translateY(0); }
+  @media (prefers-reduced-motion: reduce){
+    .slide{ transition:none; }
+  }
+
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size: clamp(.62rem,1.1vw,.78rem);
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color: var(--accent);
+    font-weight:600;
+    margin:0 0 .5em;
+  }
+  h1.headline{
+    font-family: var(--font-display);
+    font-weight:600;
+    text-wrap: balance;
+    line-height:1.08;
+    letter-spacing:-.01em;
+    margin:0 0 .3em;
+    color: var(--ink);
+  }
+  .sub{
+    font-size: clamp(.85rem,1.5vw,1.05rem);
+    color: var(--ink-soft);
+    max-width: 62ch;
+    line-height:1.5;
+    margin: 0 0 .8em;
+  }
+  .grow{ flex:1; min-height:0; }
+
+  /* --- SIR compartment chain, the recurring motif --- */
+  .sir-chain{ display:flex; align-items:center; gap:.5em; }
+  .pill{
+    font-family: var(--font-mono); font-weight:600; font-size: .95em;
+    color:#fff; padding:.42em .9em; border-radius:999px; line-height:1;
+    box-shadow: 0 2px 6px -2px rgba(0,0,0,.35);
+  }
+  .pill.s{ background: var(--s-blue); }
+  .pill.i{ background: var(--i-red); }
+  .pill.r{ background: var(--r-green); }
+  .arrow{ color: var(--ink-faint); font-size:1.1em; }
+  .sir-chain.lg .pill{ font-size:1.4em; padding:.55em 1.2em; }
+
+  .var-s{ color:var(--s-blue); font-weight:600; }
+  .var-i{ color:var(--i-red); font-weight:600; }
+  .var-r{ color:var(--r-green); font-weight:600; }
+  .var-b{ color:var(--amber); font-weight:600; }
+  .var-g{ color:var(--purple); font-weight:600; }
+
+  /* --- generic cards / chips --- */
+  .card{
+    background: var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding: 1em 1.15em;
+  }
+  .chip{
+    font-family: var(--font-mono); font-size:.72em; font-weight:500;
+    color: var(--ink-soft); background: var(--surface);
+    border:1px solid var(--line); border-radius:999px;
+    padding:.32em .8em; white-space:nowrap;
+  }
+  .chips{ display:flex; flex-wrap:wrap; gap:.5em; }
+
+  .figure-card{
+    background:#ffffff; border:1px solid var(--line-strong);
+    border-radius:14px; padding: .6em .8em .4em;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    box-shadow: 0 1px 2px rgba(19,26,36,.05);
+    height:100%;
+  }
+  .figure-card img{ max-width:100%; max-height:100%; height:auto; display:block; }
+  .figure-cap{
+    font-size:.72rem; color: var(--ink-faint); text-align:center;
+    margin-top:.4em; max-width:42ch;
+  }
+
+  .stat-tile{
+    background: var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:.7em .9em; text-align:center; flex:1;
+  }
+  .stat-tile .k{ font-family:var(--font-mono); font-weight:600; font-size:1.15em; }
+  .stat-tile .l{ font-size:.66rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.06em; margin-top:.15em; }
+
+  .eq{
+    font-family: var(--font-mono); font-size: clamp(.85rem,1.6vw,1.12rem);
+    color: var(--ink); line-height:2;
+  }
+
+  footer.credit{
+    position:absolute; left:16px; right:16px; bottom: 14px;
+    display:flex; align-items:center; justify-content:space-between;
+    font-family: var(--font-mono); font-size:.68rem; color:var(--ink-faint);
+  }
+  .navbar{
+    display:flex; align-items:center; gap:14px;
+  }
+  .navbtn{
+    width:34px; height:34px; border-radius:999px; border:1px solid var(--line-strong);
+    background: var(--surface); color: var(--ink); font-size:1.1rem;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .navbtn:hover{ background: var(--bg); }
+  .navbtn:active{ transform: scale(.94); }
+  .navbtn:focus-visible, .dot:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .dots{ display:flex; gap:7px; }
+  .dot{
+    width:8px; height:8px; border-radius:999px; background: var(--line-strong);
+    border:none; cursor:pointer; padding:0;
+  }
+  .dot.active{ background: var(--accent); width:20px; border-radius:999px; }
+  .counter{ font-variant-numeric: tabular-nums; min-width:3.4em; }
+
+  a.link{ color: var(--accent); text-decoration:none; border-bottom:1px solid currentColor; }
+
+  /* ---------- slide-specific layout ---------- */
+  #s1{ justify-content:center; }
+  .title-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:1.5em; flex-wrap:wrap; }
+  .team-grid{
+    display:grid; grid-template-columns: repeat(5,1fr); gap:.6em; margin-top:1.1em;
+  }
+  @media (max-width: 700px){ .team-grid{ grid-template-columns: repeat(2,1fr); } }
+  .team-card{
+    background: var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:.6em .5em; text-align:center;
+  }
+  .team-card .nm{ font-size:.74rem; font-weight:600; }
+  .team-card .id{ font-family:var(--font-mono); font-size:.66rem; color:var(--ink-faint); margin-top:.15em; }
+  .meta-row{ font-size:.85rem; color:var(--ink-soft); margin-top:.3em; }
+
+  #s2 .hook-body{ display:flex; gap: clamp(1em,2.6vw,2em); flex:1; min-height:0; align-items:stretch; }
+  #s2 .hook-left{ flex:1 1 46%; display:flex; flex-direction:column; gap:.9em; min-width:0; }
+  #s2 .hook-right{ flex:1 1 54%; min-width:0; }
+  .answer-card{
+    background: linear-gradient(135deg, color-mix(in srgb, var(--i-red) 10%, var(--surface)), var(--surface));
+    border:1px solid var(--line); border-left:4px solid var(--i-red);
+    border-radius:12px; padding:.9em 1.05em; font-size:.9rem; line-height:1.5;
+  }
+  .answer-card b{ font-family:var(--font-mono); color:var(--i-red); }
+
+  #s3 .gap-row{ display:flex; gap:1.1em; flex:1; min-height:0; }
+  #s3 .gap-card{ flex:1; display:flex; flex-direction:column; gap:.5em; }
+  #s3 .gap-card h3{ font-family:var(--font-display); font-size:1.05rem; margin:0; }
+  #s3 .gap-card p{ margin:0; font-size:.86rem; color:var(--ink-soft); line-height:1.55; }
+  #s3 .twist{
+    margin-top:1em; text-align:center; font-family:var(--font-display); font-style:italic;
+    font-size:1.05rem; color:var(--ink);
+  }
+
+  #s4 .pipeline{ display:flex; align-items:stretch; gap:.5em; margin:.8em 0 1em; flex-wrap:wrap; }
+  #s4 .pstep{ flex:1 1 0; min-width:120px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:.7em .8em; font-size:.78rem; text-align:center; }
+  #s4 .pstep b{ display:block; font-size:.9rem; margin-bottom:.15em; }
+  #s4 .parrow{ align-self:center; color:var(--ink-faint); font-size:1.3rem; }
+  #s4 .bottom-row{ display:flex; gap:1.4em; align-items:flex-start; flex:1; min-height:0; flex-wrap:wrap; }
+  #s4 .eq-box{ flex:1 1 260px; }
+
+  #s5 .results-row{ display:flex; gap:1.2em; flex:1; min-height:0; }
+  #s5 .results-left{ flex:1 1 48%; min-width:0; }
+  #s5 .results-right{ flex:1 1 52%; display:flex; flex-direction:column; gap:.7em; min-width:0; }
+  #s5 .stat-row{ display:flex; gap:.6em; }
+  #s5 .trap{
+    background: var(--surface); border:1px dashed var(--line-strong); border-radius:12px;
+    padding:.8em .9em; font-size:.8rem; color:var(--ink-soft); line-height:1.5;
+  }
+  #s5 .trap b{ color: var(--ink); }
+
+  #s6 .wrap-row{ display:flex; gap:1.3em; flex:1; min-height:0; }
+  #s6 .wrap-left{ flex:1 1 55%; display:flex; flex-direction:column; gap:.6em; }
+  #s6 .wrap-right{ flex:1 1 45%; }
+  .contrib{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.4em; }
+  .contrib li{ display:flex; gap:.6em; align-items:baseline; font-size:.78rem; background:var(--surface); border:1px solid var(--line); border-radius:9px; padding:.45em .7em; }
+  .contrib .who{ font-weight:600; white-space:nowrap; }
+  .contrib .what{ color:var(--ink-soft); }
+  .closing{ text-align:center; }
+  .closing .headline{ margin-bottom:.15em; }
+</style>
+
+<div class="deck" id="deck">
+  <div class="track" id="track">
+
+    <!-- 1 — TITLE -->
+    <section class="slide active" id="s1" data-title="Title">
+      <div class="title-top">
+        <div>
+          <p class="eyebrow">CSE 402 &middot; Numerical Analysis, Simulation &amp; Modeling</p>
+          <h1 class="headline" style="font-size:clamp(1.5rem,3.6vw,2.5rem); max-width:16ch;">Numerical Analysis of the SIR Epidemic Model</h1>
+          <p class="sub">Solver accuracy, parameter recovery, and robustness to noise.</p>
+        </div>
+        <div class="sir-chain lg" aria-hidden="true">
+          <span class="pill s">S</span><span class="arrow">&rarr;</span>
+          <span class="pill i">I</span><span class="arrow">&rarr;</span>
+          <span class="pill r">R</span>
+        </div>
+      </div>
+
+      <p class="meta-row"><b>Section [Section]</b> &middot; <b>Group [Group Number]</b> &middot; Final Project Defense</p>
+
+      <div class="team-grid">
+        <div class="team-card"><div class="nm">[Member Name]</div><div class="id">ID [Student ID]</div></div>
+        <div class="team-card"><div class="nm">[Member Name]</div><div class="id">ID [Student ID]</div></div>
+        <div class="team-card"><div class="nm">[Member Name]</div><div class="id">ID [Student ID]</div></div>
+        <div class="team-card"><div class="nm">[Member Name]</div><div class="id">ID [Student ID]</div></div>
+        <div class="team-card"><div class="nm">[Member Name]</div><div class="id">ID [Student ID]</div></div>
+      </div>
+
+      <p class="meta-row" style="margin-top:auto; padding-top:1em;">Supervised by <b>[Supervisor Name]</b></p>
+    </section>
+
+    <!-- 2 — THE HOOK -->
+    <section class="slide" id="s2" data-title="The big question">
+      <p class="eyebrow">The big question</p>
+      <h1 class="headline" style="font-size:clamp(1.25rem,2.8vw,1.9rem);">Does your choice of solver actually matter?</h1>
+      <div class="hook-body">
+        <div class="hook-left">
+          <p class="sub" style="margin-bottom:0;">We fit the SIR model to outbreak data using six solvers we wrote ourselves &mdash; from plain Forward Euler to adaptive Runge&ndash;Kutta &mdash; then asked when the solver you pick changes the answer.</p>
+          <div class="answer-card">
+            Below a noise level we call <b>&sigma;*</b>, yes &mdash; solver choice is the main source of error.<br>
+            Above <b>&sigma;*</b>, no &mdash; noise drowns it out and any solver will do.
+          </div>
+          <div class="chips">
+            <span class="chip">measured &sigma;* &asymp; 0.058</span>
+            <span class="chip">reference case: h = 0.1</span>
+          </div>
+        </div>
+        <div class="hook-right">
+          <div class="figure-card">
+            <img src="assets/e13_crossover.svg" alt="Crossover plot: solver bias line and noise standard-deviation line crossing at sigma-star">
+            <p class="figure-cap">Where the two lines cross is &sigma;* &mdash; below it, solver bias (dashed) is bigger than noise; above it, noise (solid) wins.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — BASE PAPER & GAP -->
+    <section class="slide" id="s3" data-title="Base paper">
+      <p class="eyebrow">Where we started</p>
+      <h1 class="headline" style="font-size:clamp(1.2rem,2.6vw,1.75rem);">The base paper treats the solver as a black box</h1>
+      <div class="gap-row">
+        <div class="gap-card card">
+          <h3>Capaldi et al. (2012)</h3>
+          <p>Fit the SIR model to outbreak data. Measured how confident we can be in the recovered <span class="var-b">&beta;</span> and <span class="var-g">&gamma;</span>. Showed accuracy drops as you sample less often.</p>
+        </div>
+        <div class="gap-card card" style="border-left:3px solid var(--i-red);">
+          <h3>The gap</h3>
+          <p>They never ask which ODE solver produced those numbers, or how big a step size &mdash; the solver is just "whatever gets us the curve."</p>
+        </div>
+      </div>
+      <p class="twist">Our twist: we make the solver itself the experiment.</p>
+    </section>
+
+    <!-- 4 — METHOD -->
+    <section class="slide" id="s4" data-title="Method">
+      <p class="eyebrow">How we did it</p>
+      <h1 class="headline" style="font-size:clamp(1.2rem,2.6vw,1.75rem);">One pipeline, six solvers, one exact reference</h1>
+
+      <div class="pipeline">
+        <div class="pstep"><b>SIR model</b>the 3 equations below</div>
+        <div class="parrow">&rarr;</div>
+        <div class="pstep"><b>6 solvers, hand-written</b>Euler to adaptive RK45</div>
+        <div class="parrow">&rarr;</div>
+        <div class="pstep"><b>Fit &beta;, &gamma;</b>least squares</div>
+        <div class="parrow">&rarr;</div>
+        <div class="pstep"><b>Score against truth</b>an exact, solver-free reference</div>
+      </div>
+
+      <div class="bottom-row">
+        <div class="eq-box card">
+          <div class="eq">
+            d<span class="var-s">S</span>/dt = &minus;<span class="var-b">&beta;</span><span class="var-s">S</span><span class="var-i">I</span>/N<br>
+            d<span class="var-i">I</span>/dt&nbsp;&nbsp;= &nbsp;<span class="var-b">&beta;</span><span class="var-s">S</span><span class="var-i">I</span>/N &minus; <span class="var-g">&gamma;</span><span class="var-i">I</span><br>
+            d<span class="var-r">R</span>/dt = <span class="var-g">&gamma;</span><span class="var-i">I</span>
+          </div>
+        </div>
+        <div style="flex:1 1 260px; display:flex; flex-direction:column; gap:.6em;">
+          <p class="sub" style="margin:0;">The reference solution comes from an exact algebraic reduction of these equations &mdash; no numerical solver involved &mdash; so every accuracy claim is checked against the truth, not against "a finer guess."</p>
+          <div class="chips">
+            <span class="chip">root finding</span>
+            <span class="chip">LU &amp; QR</span>
+            <span class="chip">power method</span>
+            <span class="chip">least squares</span>
+            <span class="chip">quadrature</span>
+            <span class="chip">Monte Carlo &amp; MCMC</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — RESULTS -->
+    <section class="slide" id="s5" data-title="Results">
+      <p class="eyebrow">What we found</p>
+      <h1 class="headline" style="font-size:clamp(1.2rem,2.6vw,1.75rem);">Solver error behaves exactly like the textbook says</h1>
+      <div class="results-row">
+        <div class="results-left">
+          <div class="figure-card">
+            <img src="assets/e01_convergence.svg" alt="Convergence plot: error versus step size for five solvers, each following its theoretical slope">
+            <p class="figure-cap">Halve the step size, and each solver's error shrinks by exactly its own theoretical rate.</p>
+          </div>
+        </div>
+        <div class="results-right">
+          <div class="stat-row">
+            <div class="stat-tile"><div class="k" style="color:var(--i-red)">1.03</div><div class="l">Euler, order 1</div></div>
+            <div class="stat-tile"><div class="k" style="color:var(--amber)">1.94</div><div class="l">Heun, order 2</div></div>
+            <div class="stat-tile"><div class="k" style="color:var(--r-green)">3.94</div><div class="l">RK4, order 4</div></div>
+          </div>
+          <p class="sub" style="margin:0;">Measured order matches the predicted order almost exactly &mdash; the same error then carries straight through into the fitted <span class="var-b">&beta;</span>.</p>
+          <div class="trap"><b>A trap we almost fell for:</b> checking S+I+R = N looks perfect even when the solve is completely wrong. It's not a real accuracy check &mdash; we needed the exact reference instead.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — WRAP-UP -->
+    <section class="slide" id="s6" data-title="Conclusion">
+      <p class="eyebrow">Wrapping up</p>
+      <h1 class="headline" style="font-size:clamp(1.2rem,2.6vw,1.75rem);">Below &sigma;*, the numerical method is the answer</h1>
+      <div class="wrap-row">
+        <div class="wrap-left">
+          <p class="sub" style="margin:0;">Below the crossover noise level, which solver and step size you choose decides whether your epidemic estimate is trustworthy. Above it, more data matters more than a fancier solver.</p>
+          <p class="sub" style="margin:0;"><b style="color:var(--ink)">Next:</b> run the full-scale experiment grid, verify our historical 1666 Eyam outbreak data against the original source, and test whether the crossover still holds for stiffer, higher-dimensional epidemic models.</p>
+          <ul class="contrib">
+            <li><span class="who">[Name]</span><span class="what">&mdash; numerics core: the model, the six solvers, the exact reference solution</span></li>
+            <li><span class="who">[Name]</span><span class="what">&mdash; eigenvalues, testing, and this report</span></li>
+            <li><span class="who">[Name]</span><span class="what">&mdash; fitting and uncertainty quantification</span></li>
+            <li><span class="who">[Name]</span><span class="what">&mdash; interactive web dashboard</span></li>
+            <li><span class="who">[Name]</span><span class="what">&mdash; experiment pipeline, model variants, real data</span></li>
+          </ul>
+        </div>
+        <div class="wrap-right">
+          <div class="card closing" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.6em;">
+            <div class="sir-chain lg" aria-hidden="true">
+              <span class="pill s">S</span><span class="arrow">&rarr;</span>
+              <span class="pill i">I</span><span class="arrow">&rarr;</span>
+              <span class="pill r">R</span>
+            </div>
+            <h1 class="headline" style="font-size:1.3rem; margin:.2em 0 0;">Thank you</h1>
+            <p class="sub" style="margin:0; text-align:center;">Questions welcome.</p>
+            <p class="sub" style="margin:0; text-align:center;">Code: <a class="link" href="https://github.com/g-schatten/CSE402-Project" target="_blank" rel="noopener">github.com/g-schatten/CSE402-Project</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="credit">
+    <span id="slideLabel">Title</span>
+    <div class="navbar">
+      <button class="navbtn" id="prevBtn" aria-label="Previous slide">&#8249;</button>
+      <div class="dots" id="dots"></div>
+      <button class="navbtn" id="nextBtn" aria-label="Next slide">&#8250;</button>
+    </div>
+    <span class="counter" id="counter">1 / 6</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var n = slides.length;
+  var dotsWrap = document.getElementById('dots');
+  var counter = document.getElementById('counter');
+  var label = document.getElementById('slideLabel');
+  var idx = 0;
+
+  slides.forEach(function(_, i){
+    var b = document.createElement('button');
+    b.className = 'dot' + (i === 0 ? ' active' : '');
+    b.setAttribute('aria-label', 'Go to slide ' + (i+1));
+    b.addEventListener('click', function(){ go(i); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function go(i){
+    idx = Math.max(0, Math.min(n - 1, i));
+    slides.forEach(function(s, j){ s.classList.toggle('active', j === idx); });
+    dots.forEach(function(d, j){ d.classList.toggle('active', j === idx); });
+    counter.textContent = (idx + 1) + ' / ' + n;
+    label.textContent = slides[idx].getAttribute('data-title') || '';
+    try { history.replaceState(null, '', '#' + (idx + 1)); } catch(e){}
+  }
+
+  document.getElementById('prevBtn').addEventListener('click', function(){ go(idx - 1); });
+  document.getElementById('nextBtn').addEventListener('click', function(){ go(idx + 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown'){ go(idx + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ go(idx - 1); e.preventDefault(); }
+  });
+
+  // swipe support
+  var track = document.getElementById('track'), sx = null;
+  track.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive:true});
+  track.addEventListener('touchend', function(e){
+    if (sx === null) return;
+    var dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 40){ go(idx + (dx < 0 ? 1 : -1)); }
+    sx = null;
+  }, {passive:true});
+
+  // deep link: bare #N token
+  var m = /^#(\d+)$/.exec(location.hash);
+  if (m){ var k = parseInt(m[1], 10) - 1; if (k >= 0 && k < n) idx = k; }
+  go(idx);
+})();
+</script>
