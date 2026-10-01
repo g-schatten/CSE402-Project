@@ -40,7 +40,7 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{acmart}
-[2026/08/16 v2.20 Typesetting articles for the Association for Computing Machinery]
+[2026/06/27 v2.19 Typesetting articles for the Association for Computing Machinery]
 \def\@classname{acmart}
 \InputIfFileExists{acmart-preload-hook.tex}{%
   \ClassWarning{\@classname}{%
@@ -422,17 +422,17 @@
   }%
   \addto\captionsfrench{%
       \if@ACM@journal
-        \renewcommand\keywordsname{Mots Cl^^c3^^a9s et Phrases Suppl^^c3^^a9mentaires}%
+        \renewcommand\keywordsname{Mots Clés et Phrases Supplémentaires}%
       \else
-        \renewcommand\keywordsname{Mots cl^^c3^^a9s}%
+        \renewcommand\keywordsname{Mots clés}%
       \fi
       \renewcommand\acksname{Remerciements}%
   }%
   \addto\captionsgerman{%
       \if@ACM@journal
-        \renewcommand\keywordsname{Zus^^c3^^a4tzliche Schlagw^^c3^^b6rter und Phrasen}%
+        \renewcommand\keywordsname{Zusätzliche Schlagwörter und Phrasen}%
       \else
-        \renewcommand\keywordsname{Schlagw^^c3^^b6rter}%
+        \renewcommand\keywordsname{Schlagwörter}%
       \fi
       \renewcommand\acksname{Danksagungen}%
   }%
@@ -1542,10 +1542,6 @@
     \gdef\acmConference@shortname{#2}%
   \fi
   \global\@ACM@journal@bibstripfalse
-  \ifnum\ACM@format@nr=1\relax % acmsmall
-    \global\@ACM@journal@bibstrip@or@togfalse
-    \settopmatter{printfolios=false}%
-  \fi
   \ifx\@acmBooktitle\@empty\relax
     \acmBooktitle{Proceedings of \acmConference@name
       \ifx\acmConference@name\acmConference@shortname\else
@@ -1636,7 +1632,7 @@
   \def\position##1{\ignorespaces}%
   \def\institution##1{##1\ignorespaces}%
   \def\department{\@ifnextchar[{\@department}{\@department[]}}%
-  \def\@department[##1]##2{, ##2 \ignorespaces}%
+  \def\@department[##1]##2{##2, \ignorespaces}%
   \let\city\position
   \let\state\position
   \let\country\position
@@ -2079,7 +2075,7 @@
    affiliate of the national government of Canada. As such, the Crown
    in Right of Canada retains an equal interest in the
    copyright. Reprints must include clear attribution to ACM and the
-   author^^e2^^80^^99s government agency affiliation. Permission to make digital
+   author’s government agency affiliation. Permission to make digital
    or hard copies for personal or classroom use is granted. Copies
    must bear this notice and the full citation on the first
    page. Copyrights for components of this work owned by others than
@@ -2726,7 +2722,7 @@
   \def\and{\par}\normalbaselines
   \global\setbox\author@bx=\vtop{\if@ACM@sigchiamode\else\centering\fi
     \@authorfont\@currentauthors\par\@affiliationfont
-    \@currentaffiliation\par}\egroup
+    \@currentaffiliation}\egroup
   \box\author@bx\hspace{\author@bx@sep}%
   \gdef\@currentauthors{}%
   \gdef\@currentaffiliation{}}

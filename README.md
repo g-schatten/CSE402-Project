@@ -1,66 +1,115 @@
 # SIRLab — Numerical Analysis of the SIR Epidemic Model
 
-**CSE 402: Numerical Analysis, Simulation & Modeling — Section B, Group 2**
+**CSE 402: Numerical Analysis, Simulation & Modeling — Section B, Group 02**
 
-A rigorous numerical-analysis study of the SIR epidemic model, paired with a polished interactive
-web dashboard. We treat the ODE solver itself as the central experimental variable — extending
-Capaldi et al. (2012), which estimates SIR parameters but treats the solver as a black box.
+| Member | Student ID |
+|---|---|
+| Saif Uz Zaman | 2105088 |
+| Sayaad Muzahid Masfi | 2105066 |
+| Ibtida bin Ahmed | 2105061 |
+| Sakif Naieb Raiyan | 2105065 |
+| Aurchi Chowdhury | 2105083 |
 
-**The headline finding:** there exists a *crossover noise level σ\** at which solver-induced bias
-in the recovered (β, γ) is exactly matched by noise-induced variance. Below σ\*, the choice of ODE
-solver is the dominant error source; above it, solver refinement buys nothing distinguishable from
-noise. See [`PLAN.md`](PLAN.md) for the full research plan, and the **Crossover σ\*** page of the
-dashboard for the measured curve.
+A numerical-analysis study of the SIR epidemic model, paired with an interactive web dashboard.
+Our base paper, Capaldi et al. (2012), estimates SIR parameters by least squares but treats the
+ODE solver as a black box. We make the solver and its step size the central experimental variables.
+
+**Headline finding.** Solver truncation error passes into the fitted (β, γ) with the solver's own
+convergence order, and it competes with noise-induced spread. The two are equal at a *crossover
+noise level σ\**. Below σ\* the solver dominates the estimation error; above it, noise does. For
+forward Euler, σ\* ≈ 5.8% of peak prevalence at h = 0.1 day and 15.6% at h = 0.25.
+
+The final report is [`report/B_02.tex`](report/B_02.tex) (ACM `sigconf` format).
+
+## Research questions
+
+From the project proposal ([`SectionB_Group2_SIR_Project_Proposal (1).pptx`](SectionB_Group2_SIR_Project_Proposal%20(1).pptx)):
+
+- **RQ1. Solver comparison:** how do forward Euler, Heun and RK4 differ in accuracy, convergence
+  order and stability on the SIR system?
+- **RQ2. Parameter recovery:** how does the choice of solver propagate into (β, γ) recovered by
+  least squares?
+- **RQ3. Noise and sampling robustness:** how robust is recovery to noise, sampling frequency,
+  initial conditions and the true (β, γ)?
+- **RQ4. Extension:** do the findings hold for SEIR / SIRS / SIR-with-vaccination and for real data
+  (Eyam, 1666)?
 
 ## Repository layout
 
 ```
-core/sirlab/       hand-written numerical library (models, solvers, linalg, estimation, UQ)
-experiments/       the 14-experiment registry (E01-E14) + runner
-configs/           one YAML per experiment (every knob lives here)
-results/           generated JSON artifacts (git-ignored; regenerate with `make experiments`)
-figures/           generated .pdf/.svg report figures (never pasted in by hand)
-tests/             pytest suite (unit, order-verification, estimator, UQ, hygiene)
-web/               Vite + React + TypeScript interactive dashboard
-scripts/           figure generation, TS/Python parity fixtures
-notebooks/         narrative Jupyter notebooks per research question
-data/raw/          Eyam 1666 dataset + provenance note
-report/            LaTeX report
-deck/              presentation outline
+core/sirlab/       hand-written numerical library: models, solvers, linalg (LU, QR, eigen),
+                   quadrature, roots, estimation, uncertainty quantification, gold standard
+experiments/       the 14-experiment registry (E01-E14) and its runner
+configs/           one YAML per experiment, each with a `quick` and a `full` profile
+results/           generated JSON results (git-ignored; regenerate with the runner)
+tests/             pytest suite (82 tests)
+web/               Vite + React + TypeScript dashboard (10 pages) with its own TS solvers
+scripts/           quick-look figures, TS/Python parity fixtures, notebook generator
+notebooks/         one Jupyter notebook per research question (RQ1-RQ4)
+data/raw/          Eyam 1666 dataset and its provenance note
+report/            final report: B_02.tex, refs.bib, ACM template files, figures/,
+                   make_report_figures.py
+deck/              presentation (slides and outline)
+supervisor_slides/ supervisor briefing deck (Beamer slides.tex + make_figures.py)
+PLAN.md            the project's research plan (code docstrings cite its sections)
 ```
+
+## Experiments
+
+| ID | Name | RQ | ID | Name | RQ |
+|---|---|---|---|---|---|
+| E01 | Convergence & order | 1 | E08 | Noise degradation | 3 |
+| E02 | Invariant drift | 1 | E09 | Sampling & window | 3 |
+| E03 | Stability frontier | 1 | E10 | Initial conditions | 3 |
+| E04 | Structural accuracy | 1 | E11 | Uncertainty quantification | 3 |
+| E05 | Cost landscape | 3 | E12 | Model variants | 4 |
+| E06 | Optimizer shoot-out | 3 | E13 | Crossover σ\* | 2+3 |
+| E07 | Solver-in-the-loop recovery | 2 | E14 | Real data (Eyam 1666) | 4 |
 
 ## Quickstart
 
+Requires Python ≥ 3.11 (and Node.js for the dashboard). These commands work on any OS:
+
 ```bash
-make setup                       # venv + Python deps + npm install
-make test                        # Python test suite (50 tests)
-make experiments                 # run all 14 experiments (quick profile, ~10-15 min)
-make web                         # start the dashboard dev server at localhost:5173
-make figures                     # regenerate report figures from results/*.json
+pip install -e ".[dev]"                              # sirlab + numpy, matplotlib, scipy, pytest...
+pytest tests/ -q                                     # 82 tests
+python -m experiments.runner --all --profile quick   # all 14 experiments, ~17 min with 8 workers
+python -m experiments.runner E07 --profile full      # one experiment at paper scale (slow)
+python report/make_report_figures.py                 # report figures from results/*.json
+
+mkdir -p web/public/data && cp results/*.json web/public/data/   # results for the dashboard
+cd web && npm ci
+npx vitest run                                       # TS/Python parity test (9 cases)
+npm run dev                                          # dashboard at localhost:5173
 ```
 
-Run one experiment at higher fidelity: `make experiment ID=E07 PROFILE=full` (see PLAN.md §5 —
-the `full` profile matches the paper-scale factorial and is intended for an offline/overnight run,
-not an interactive session).
+On Linux/macOS the [`Makefile`](Makefile) wraps the same steps (`make setup`, `make test`,
+`make experiments`, `make figures`, `make web`, `make report`).
+
+**Building the report:** upload `report/` (or a zip of `B_02.tex`, `refs.bib`, the `acm*`/`.bst`/
+`.bbx`/`.cbx`/`.dbx` files and `figures/`) to Overleaf and compile with pdfLaTeX + BibTeX, or run
+`cd report && latexmk -pdf B_02.tex` locally.
 
 ## Design principles
 
 - **`core/sirlab` never imports SciPy or matplotlib** (enforced by `tests/test_hygiene.py`). Every
-  solver, optimizer, root-finder, and eigenvalue routine (power method, inverse power method,
-  Hotelling deflation — `core/sirlab/linalg/eigen.py`) is hand-written; SciPy/NumPy's own
-  routines appear only in tests, as an independent cross-check.
-- **The semi-analytic gold standard** (`core/sirlab/reference.py`) gives an SIR trajectory accurate
-  to machine precision with no ODE solver in the loop, so every accuracy claim in this project is
-  measured against ground truth, not against "a finer numerical solve."
-- **The web dashboard ships its own solver implementations** (`web/src/numerics/`), parity-tested
-  against the Python core to ~1e-9 (`web/tests/parity.test.ts`), so every slider recomputes live in
-  the browser while heavier factorial sweeps load from precomputed JSON.
-- **Every result is reproducible.** Each experiment is seeded, content-hash cached
-  (`sirlab.io.manifest`), and traceable to a specific artifact in `results/`.
+  solver, optimizer, root finder and eigenvalue routine is hand-written. SciPy/NumPy routines appear
+  only in the tests, as independent cross-checks. Random numbers come from NumPy's PCG64 generator.
+- **A semi-analytic gold standard** (`core/sirlab/reference.py`) gives the SIR trajectory to near
+  machine precision without any ODE solver. It uses the exact phase-plane reduction, adaptive
+  Simpson quadrature and safeguarded Newton. Every accuracy claim is measured against it, not
+  against "a finer numerical solve".
+- **The dashboard ships its own solvers** (`web/src/numerics/`), parity-tested against the Python
+  core (`web/tests/parity.test.ts`: solver states to 1e-9, gold standard to 1e-6). The Model Lab,
+  Solver Arena and Stability pages recompute live; the other pages load precomputed results.
+- **Every result is reproducible.** Each experiment is seeded (base seed `k` for `Ek`, with
+  per-replicate CRC32-derived seeds), and each run is recorded and content-hash cached in
+  `results/manifest.json`.
 
-## Status
+## Status and caveats
 
-Core numerics, all 14 experiments (quick profile), and the 10-page dashboard are implemented and
-tested. The `full` profile (paper-scale factorial sizes, e.g. E07's ~1.9M-fit design) has not been
-run in this session — see PLAN.md §9 for the build order and §12 for open items, including a data
-provenance caveat on the Eyam 1666 dataset (`data/raw/provenance.md`).
+- All 14 experiments, the test suite and the dashboard are implemented, and the tests pass.
+- Every number in the report comes from the `quick` profile. The `full` profile (for example
+  E07's ~1.9M-fit design) has not been run.
+- The Eyam 1666 counts have not yet been verified against the primary source; see
+  [`data/raw/provenance.md`](data/raw/provenance.md).

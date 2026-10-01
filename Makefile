@@ -1,4 +1,4 @@
-.PHONY: setup core experiments figures web web-build web-test report all clean test
+.PHONY: setup core experiments experiment figures quicklook fixtures web web-build web-test report deck all clean test
 
 PY := . .venv/bin/activate &&
 PROFILE ?= quick
@@ -27,7 +27,12 @@ experiment:
 	mkdir -p web/public/data
 	cp results/$(ID).json web/public/data/ 2>/dev/null || true
 
+# Figures used by the report (report/figures/*.pdf)
 figures:
+	$(PY) python report/make_report_figures.py
+
+# Quick-look figures of every experiment (figures/, git-ignored)
+quicklook:
 	$(PY) python scripts/make_figures.py
 
 fixtures:
@@ -42,13 +47,15 @@ web-test: fixtures
 web-build:
 	cd web && npm run build
 
+# Final report (needs a local TeX install; or upload report/ to Overleaf)
 report: figures
-	cd report && latexmk -pdf main.tex
+	cd report && latexmk -pdf B_02.tex
 
 deck:
-	@echo "See deck/OUTLINE.md; build the .pptx with the pptx skill from that outline."
+	@echo "Presentation: deck/presentation.pptx (outline in deck/OUTLINE.md)"
 
 all: setup core experiments web-test figures
 
 clean:
 	rm -rf results/*.json web/public/data/*.json figures/*.pdf figures/*.svg
+	cd report && latexmk -c B_02.tex 2>/dev/null || true

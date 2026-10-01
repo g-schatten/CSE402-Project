@@ -28,7 +28,11 @@ report/*.blg
 report/*.fls
 report/*.fdb_latexmk
 report/*.synctex.gz
-# keep the compiled report itself (report/main.pdf) tracked
+report/*.xdv
+# local Overleaf upload bundle and preview builds
+report/*.zip
+report/B_02_preview.pdf
+# report/figures/*.pdf and the final report/B_02.pdf are tracked
 
 # OS / editor
 .DS_Store
