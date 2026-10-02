@@ -18,8 +18,8 @@ export default function RealData() {
   return (
     <div>
       <PageHeader eyebrow="08 · Precomputed (E14) · Optional extension" title="Real Data: Eyam, 1666">
-        The same estimation pipeline applied to the historical Eyam plague outbreak. This is a demonstration, not a
-        proof — see <code>data/raw/provenance.md</code> for a caveat on the digitized counts.
+        The same estimation pipeline applied to the historical Eyam plague outbreak (Raggett, 1982; source details in
+        <code> data/raw/provenance.md</code>). This is a demonstration, not a proof.
       </PageHeader>
 
       {loading && <Card>Loading…</Card>}
@@ -32,7 +32,7 @@ export default function RealData() {
             <LineChart
               width={1080}
               height={340}
-              xLabel="day"
+              xLabel="days after 18 June 1666"
               yLabel="S(t)"
               series={[
                 { id: "observed", color: "var(--text-primary)", points: data.days.map((d, i) => ({ x: d, y: data.s_observed[i] })) },

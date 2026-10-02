@@ -19,11 +19,13 @@ convergence order, and it competes with noise-induced spread. The two are equal 
 noise level σ\**. Below σ\* the solver dominates the estimation error; above it, noise does. For
 forward Euler, σ\* ≈ 5.8% of peak prevalence at h = 0.1 day and 15.6% at h = 0.25.
 
-The final report is [`report/B_02.tex`](report/B_02.tex) (ACM `sigconf` format).
+**Final report:** [`report/B_02.pdf`](report/B_02.pdf) (source: [`report/B_02.tex`](report/B_02.tex),
+ACM `sigconf` template).
 
 ## Research questions
 
-From the project proposal ([`SectionB_Group2_SIR_Project_Proposal (1).pptx`](SectionB_Group2_SIR_Project_Proposal%20(1).pptx)):
+From the project proposal
+([`presentations/SectionB_Group2_SIR_Project_Proposal.pptx`](presentations/SectionB_Group2_SIR_Project_Proposal.pptx)):
 
 - **RQ1. Solver comparison:** how do forward Euler, Heun and RK4 differ in accuracy, convergence
   order and stability on the SIR system?
@@ -46,12 +48,11 @@ tests/             pytest suite (82 tests)
 web/               Vite + React + TypeScript dashboard (10 pages) with its own TS solvers
 scripts/           quick-look figures, TS/Python parity fixtures, notebook generator
 notebooks/         one Jupyter notebook per research question (RQ1-RQ4)
-data/raw/          Eyam 1666 dataset and its provenance note
-report/            final report: B_02.tex, refs.bib, ACM template files, figures/,
-                   make_report_figures.py
-deck/              presentation (slides and outline)
-supervisor_slides/ supervisor briefing deck (Beamer slides.tex + make_figures.py)
-PLAN.md            the project's research plan (code docstrings cite its sections)
+data/raw/          Eyam 1666 dataset and its source (provenance.md)
+report/            final report B_02.pdf and its sources: B_02.tex, refs.bib, ACM template
+                   files, figures/ and make_report_figures.py
+presentations/     project proposal, final presentation (pptx + html), supervisor slides
+PLAN.md            the project's original research plan (code docstrings cite its sections)
 ```
 
 ## Experiments
@@ -68,10 +69,10 @@ PLAN.md            the project's research plan (code docstrings cite its section
 
 ## Quickstart
 
-Requires Python ≥ 3.11 (and Node.js for the dashboard). These commands work on any OS:
+Requires Python ≥ 3.11, and Node.js for the dashboard. These commands work on any OS:
 
 ```bash
-pip install -e ".[dev]"                              # sirlab + numpy, matplotlib, scipy, pytest...
+pip install -e ".[dev]"                              # sirlab + numpy, pyyaml; dev: scipy, matplotlib, pandas, pytest, hypothesis
 pytest tests/ -q                                     # 82 tests
 python -m experiments.runner --all --profile quick   # all 14 experiments, ~17 min with 8 workers
 python -m experiments.runner E07 --profile full      # one experiment at paper scale (slow)
@@ -83,12 +84,10 @@ npx vitest run                                       # TS/Python parity test (9 
 npm run dev                                          # dashboard at localhost:5173
 ```
 
-On Linux/macOS the [`Makefile`](Makefile) wraps the same steps (`make setup`, `make test`,
-`make experiments`, `make figures`, `make web`, `make report`).
-
-**Building the report:** upload `report/` (or a zip of `B_02.tex`, `refs.bib`, the `acm*`/`.bst`/
-`.bbx`/`.cbx`/`.dbx` files and `figures/`) to Overleaf and compile with pdfLaTeX + BibTeX, or run
-`cd report && latexmk -pdf B_02.tex` locally.
+The notebooks read `results/*.json` and open in Jupyter (`pip install jupyter`). On Linux/macOS
+the [`Makefile`](Makefile) wraps the same steps (`make setup`, `make test`, `make experiments`,
+`make figures`, `make web`, `make report`). The report compiles with pdfLaTeX + BibTeX, either on
+Overleaf (upload the `report/` folder) or locally with `cd report && latexmk -pdf B_02.tex`.
 
 ## Design principles
 
@@ -103,13 +102,18 @@ On Linux/macOS the [`Makefile`](Makefile) wraps the same steps (`make setup`, `m
   core (`web/tests/parity.test.ts`: solver states to 1e-9, gold standard to 1e-6). The Model Lab,
   Solver Arena and Stability pages recompute live; the other pages load precomputed results.
 - **Every result is reproducible.** Each experiment is seeded (base seed `k` for `Ek`, with
-  per-replicate CRC32-derived seeds), and each run is recorded and content-hash cached in
-  `results/manifest.json`.
+  per-replicate CRC32-derived seeds). Each run is recorded in `results/manifest.json` (config hash,
+  git commit, seed, wall time, host) and skipped when its config is unchanged.
 
-## Status and caveats
+## Data
 
-- All 14 experiments, the test suite and the dashboard are implemented, and the tests pass.
-- Every number in the report comes from the `quick` profile. The `full` profile (for example
-  E07's ~1.9M-fit design) has not been run.
-- The Eyam 1666 counts have not yet been verified against the primary source; see
-  [`data/raw/provenance.md`](data/raw/provenance.md).
+`data/raw/eyam_1666.csv` holds the susceptible and infective counts for the Eyam plague, 18 June to
+20 October 1666, from Raggett (1982), *A stochastic model of the Eyam plague*, Journal of Applied
+Statistics 9(2):212–225. The values follow the table as reproduced in arXiv:1603.03819 (Table 1)
+and arXiv:1809.07139 (Table 4). See [`data/raw/provenance.md`](data/raw/provenance.md).
+
+## Status
+
+All 14 experiments, the test suite and the dashboard are implemented, and the tests pass. Every
+number in the report comes from the `quick` profile; the `full` profile (for example E07's
+~1.9M-fit design) has not been run.

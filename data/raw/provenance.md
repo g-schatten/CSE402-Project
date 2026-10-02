@@ -2,32 +2,40 @@
 
 ## eyam_1666.csv
 
-The 1665-1666 plague outbreak in the village of Eyam, Derbyshire, England, is
-the standard "hello world" dataset for SIR model fitting (small, closed
-population, famously well-documented because the village self-quarantined).
+Susceptible and infective counts for the plague outbreak in the village of Eyam, Derbyshire,
+England, between 18 June and 20 October 1666. The village isolated itself during the outbreak,
+which makes it a standard small, closed-population data set for SIR fitting.
 
-The commonly cited source for the (day, S) counts used in numerical-methods
-courses is:
+**Primary source.**
 
-> Raggett, G. F. (1982). "Modeling the Eyam plague." *Bulletin of the
-> Institute of Mathematics and its Applications*, 18, 221-226.
+> Raggett, G. (1982). A stochastic model of the Eyam plague. *Journal of Applied Statistics*,
+> 9(2), 212–225.
 
-with often-repeated total population N = 261 and initial infectious I0 = 7
-(so S0 = N - I0 = 254 at t=0).
+Raggett obtained the counts from the parish list of deaths. The infective population is
+estimated from the list of future deaths by assuming a fixed length of illness before death,
+and the susceptible population follows because the village was isolated.
 
-**Action item before the report/deck cite these numbers:** the digitized
-(day, S) pairs in `eyam_1666.csv` were reconstructed from memory of the
-widely-reproduced version of this table (as it appears in numerous SIR
-teaching materials) and have **not** been verified against Raggett (1982)
-directly in this session (no network access was used to fetch the primary
-source). Before E14's fit is reported as a real result:
+**Digitization used here.** The values are taken from Raggett's table as reproduced, identically,
+in two independent publications:
 
-1. Locate a verified digitization of Raggett's table (library copy, a
-   textbook that reproduces it with citation, or a maintained dataset
-   repository) and replace `eyam_1666.csv` if the numbers differ.
-2. If the values already match, remove this caveat and record the exact
-   source (page/table number) here instead.
+- L. S. T. Ho, J. Xu, F. W. Crawford, V. N. Minin and M. A. Suchard, *Birth/birth-death
+  processes and their computable transition probabilities with biological applications*,
+  arXiv:1603.03819, Table 1;
+- A. Golightly and C. Sherlock, *Efficient sampling of conditioned Markov jump processes*,
+  arXiv:1809.07139, Table 4.
 
-This does not block development: the numerical pipeline (E14) is written
-against the CSV's schema (`day,date,susceptible`) regardless of the exact
-values, so swapping in verified numbers later requires no code changes.
+The same table ships as the `Eyam` data set of the R package `MultiBD`.
+
+| Column | Meaning |
+|---|---|
+| `month` | time in months after 18 June 1666, as published (0, 0.5, …, 3, 4) |
+| `day` | the same time in days, `month × 365.25 / 12` (rates in this project are per day) |
+| `susceptible` | susceptible count S |
+| `infective` | estimated infective count I |
+
+The model uses N = S + I at t = 0 = 254 + 7 = 261 and I₀ = 7 (`configs/e14.yaml`). The fit in
+`experiments/E14_realdata.py` uses the `day` and `susceptible` columns.
+
+**History.** An earlier version of this file had the commonly reproduced susceptible counts but an
+invented time axis: eight points 14 days apart, ending on 25 September. It was replaced by the
+verified table above, with the real observation times.

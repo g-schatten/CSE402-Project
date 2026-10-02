@@ -287,7 +287,7 @@ def fig_eyam() -> None:
         r = d["results"][solver]
         ax.plot(d["days"], r["predicted_s"], ls=ls, marker=m, ms=3, color=c,
                 label=f"{lab} fit, $\\hat{{\\mathcal{{R}}}}_0={r['r0']:.2f}$")
-    ax.set_xlabel("days after 19 June 1666")
+    ax.set_xlabel("days after 18 June 1666")
     ax.set_ylabel("susceptible $S$")
     ax.legend(loc="upper right")
     save(fig, "eyam")

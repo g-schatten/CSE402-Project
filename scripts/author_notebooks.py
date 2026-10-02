@@ -235,7 +235,7 @@ rq4 = [
         "# RQ4 -- Extensions: model variants and real data\n\n"
         "*Does the RQ1-RQ3 ordering survive a harder model or real data?*\n\n"
         "Narrates `E12_variants.py` (SEIR / SIRS / SIR+vaccination) and `E14_realdata.py` (Eyam 1666 -- "
-        "see `data/raw/provenance.md` for a data-source caveat before citing these numbers)."
+        "data source in `data/raw/provenance.md`)."
     ),
     code(COMMON_SETUP),
     md("## Model variants (E12)\n\nConvergence order on SEIR/SIRS/SIR-V, measured against a tight RK45 reference (no closed form exists for these models)."),
@@ -262,12 +262,11 @@ plt.show()
     ),
     md(
         "## Honest limitations\n\n"
-        "- The Eyam dataset's digitized counts were reconstructed from memory of commonly-reproduced "
-        "teaching tables and have not been verified against the primary source in this session "
-        "(see `data/raw/provenance.md`).\n"
-        "- SIR is a poor model for a small, closed population with no births/deaths and complete "
-        "quarantine -- Eyam is a demonstration that the pipeline *runs* on real data, not a claim "
-        "that SIR is the right model for it."
+        "- The Eyam counts are Raggett's (1982) table as reproduced in two independent publications "
+        "(see `data/raw/provenance.md`); the fit uses the susceptible counts only.\n"
+        "- A deterministic SIR model ignores the chance effects that matter in a population of 261 "
+        "-- Eyam is a demonstration that the pipeline *runs* on real data, not a claim that "
+        "deterministic SIR is the right model for it."
     ),
 ]
 

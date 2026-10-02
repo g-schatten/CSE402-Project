@@ -25,6 +25,7 @@
 \usepackage{tabularx}
 
 \newcommand{\repo}{\url{https://github.com/g-schatten/CSE402-Project}}
+\definecolor{repoblue}{HTML}{1F5FA8}
 
 \begin{document}
 
@@ -81,36 +82,49 @@ estimate the transmission rate $\beta$, the recovery rate $\gamma$ and
 the reproduction number $\mathcal{R}_0$. Our base paper, Capaldi et
 al.\ (2012), studies this inverse problem in depth but treats the ODE
 solver as a black box. We make the solver and its step size $h$ the
-central experimental variables. From scratch, we implement: six ODE
+central experimental variables. From scratch, we implement six ODE
 solvers (Euler, Heun, RK4, Dormand--Prince RK45, backward Euler,
-trapezoidal); Levenberg--Marquardt estimation with forward sensitivity
-equations and LU decomposition; power-method eigenvalue routines; and
+trapezoidal), Levenberg--Marquardt estimation with forward sensitivity
+equations and LU decomposition, power-method eigenvalue routines, and
 four uncertainty-quantification methods, including Monte Carlo
 simulation and Metropolis--Hastings sampling. Every accuracy figure is
-measured against a solver-free gold standard, built from the model's
-exact phase-plane reduction with adaptive Simpson quadrature and
-safeguarded Newton root finding. In 14 reproducible experiments the
-solvers reach their theoretical orders (observed 1.03, 1.94 and 3.94 for
-Euler, Heun and RK4). The bias they cause in the fitted $\beta$ follows
-the same order: a five-fold smaller step reduces it by factors of 5.0,
-24.2 and 608. This bias competes with the spread caused by noise, and
-the two are equal at a crossover noise level $\sigma^*$. For Euler,
+measured against a solver-free gold standard built from the model's
+exact phase-plane reduction. In 14 reproducible experiments the solvers
+reach their theoretical orders (observed 1.03, 1.94 and 3.94 for Euler,
+Heun and RK4). The bias they cause in the fitted $\beta$ follows the
+same order: a five-fold smaller step reduces it by factors of 5.0, 24.2
+and 608. This bias competes with the spread caused by noise, and the
+two are equal at a crossover noise level $\sigma^*$. For Euler,
 $\sigma^*$ is 5.8\% of peak prevalence at $h=0.1$ and 15.6\% at
 $h=0.25$, as a simple scaling law $\sigma^*\propto h^p$ predicts. Below
 $\sigma^*$ the solver dominates the estimation error; above it, noise
-does. We also reproduce the base paper's identifiability findings and
-fit the 1666 Eyam plague outbreak ($\hat{\mathcal{R}}_0\approx1.67$).
+does. We also reproduce the base paper's identifiability findings, and
+our fit to the 1666 Eyam plague matches the original study's
+$\mathcal{R}_0$ within 1\%.
 \end{abstract}
 
 \keywords{SIR model, ODE solvers, convergence order, parameter estimation,
   Levenberg--Marquardt, Monte Carlo simulation, uncertainty quantification}
 
+%% Repository banner: acmart places teaser content across the full page
+%% width, between the author block and the abstract.
+\begin{teaserfigure}
+  \centering
+  \Description{Boxed banner giving the address of the project's public
+    GitHub repository.}
+  \setlength{\fboxsep}{7pt}\setlength{\fboxrule}{1.2pt}%
+  \fcolorbox{repoblue}{repoblue!6}{\parbox{0.94\textwidth}{\centering
+    {\sffamily\fontsize{9}{11}\selectfont\bfseries\color{repoblue}SOURCE
+      CODE, DATA AND EXPERIMENTS \,\textbullet\, PUBLIC GITHUB
+      REPOSITORY}\\[6pt]
+    {\fontsize{16}{19}\selectfont\bfseries
+      \url{https://github.com/g-schatten/CSE402-Project}}}}
+\end{teaserfigure}
+
 \maketitle
 
-\noindent\textbf{Source code:} \repo~\cite{sirlab_repo}
-
 %% =====================================================================
-\section{Introduction and Base Paper Review}
+\section{Introduction \& Base Paper Review}
 \label{sec:intro}
 %% =====================================================================
 
@@ -143,6 +157,7 @@ project asks how large that effect is, and when it matters.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/teaser.pdf}
+  \Description{Line plot of the infectious count over 100 days. The exact curve and RK4 with a one-day step coincide; forward Euler peaks later and higher.}
   \caption{Same parameters $(\beta,\gamma)=(0.3,0.1)$, different
     solvers. With a one-day step, forward Euler overestimates the peak
     by 12 people and places it 2.6 days late; RK4 is indistinguishable
@@ -277,6 +292,7 @@ $\hat\theta$ can be split into a solver part and a noise part
   \end{tabular}
   \caption{The solver-in-the-loop estimation pipeline.}
   \label{fig:pipeline}
+  \Description{Flow diagram of four stages: gold standard, synthetic data, the fitting loop with the solver under test, and evaluation.}
 \end{figure}
 
 \subsection{A solver-free gold standard}
@@ -554,7 +570,7 @@ the random number generator.
       Gauss--Newton & \path{estimate/lm.py}, \texttt{gaussnewton.py}\\
     Golden section, Nelder--Mead & Coordinate descent and profile
       likelihood; derivative-free baseline
-      & \path{estimate/golden.py}, \texttt{neldermead.py}\\
+      & \path{estimate/golden.py},\newline\path{estimate/neldermead.py}\\
     \multicolumn{3}{@{}l}{\textbf{Interpolation and integration}}\\
     Cubic Hermite / linear interp. & Solver output at the observation
       times; locating $\sigma^*$ & \path{solvers/base.py}\\
@@ -574,24 +590,25 @@ the random number generator.
 \end{table*}
 
 %% =====================================================================
-\section{Implementation and Experiments}
+\section{Implementation \& Experiments}
 \label{sec:impl}
 %% =====================================================================
 
-\subsection{Software}
-The code is public at \repo. Its main parts are:
+\subsection{Software and libraries}
+The code is public at \repo~\cite{sirlab_repo}. Its main parts are:
 \begin{itemize}
   \item \path{core/sirlab/}: the numerical library, about 3{,}100
-    lines of Python~3.11 on NumPy arrays. It contains \texttt{models}
-    (SIR, SEIR, SIRS and SIR-V, with analytic Jacobians),
-    \texttt{solvers}, \texttt{linalg}, \texttt{quadrature},
-    \texttt{roots}, \texttt{estimate} and \texttt{uq}, plus
-    \texttt{reference.py} (the gold standard) and
+    lines of Python~3.11~\cite{python} on NumPy~\cite{harris2020numpy}
+    arrays. It contains \texttt{models} (SIR, SEIR, SIRS and SIR-V, with
+    analytic Jacobians), \texttt{solvers}, \texttt{linalg},
+    \texttt{quadrature}, \texttt{roots}, \texttt{estimate} and
+    \texttt{uq}, plus \texttt{reference.py} (the gold standard) and
     \texttt{sensitivity.py}.
   \item \path{experiments/} and \path{configs/}: one script and one
-    YAML file per experiment, run through a common registry and runner.
-  \item \path{tests/}: 82 pytest~\cite{pytest} tests, all passing. They
-    check:
+    YAML file (read with PyYAML~\cite{pyyaml}) per experiment, run
+    through a common registry and runner.
+  \item \path{tests/}: 82 pytest~\cite{pytest} tests, all passing, two of
+    them property-based with Hypothesis~\cite{hypothesis}. They check:
     \begin{itemize}
       \item LU, QR and the eigenpairs against SciPy and
         LAPACK~\cite{scipy};
@@ -603,21 +620,29 @@ The code is public at \repo. Its main parts are:
         matplotlib, and nothing outside the tests calls NumPy's eigen-
         or SVD solvers.
     \end{itemize}
-  \item \path{web/}: a 10-page React~\cite{react}/TypeScript dashboard
-    with d3 scales~\cite{bostock2011}. It ships a TypeScript copy of the
+  \item \path{notebooks/}: one Jupyter~\cite{jupyter} notebook per
+    research question, reading the same result files (one table uses
+    pandas~\cite{pandas}).
+  \item \path{web/}: a 10-page dashboard in TypeScript~\cite{typescript}
+    with React~\cite{react}, React Router~\cite{reactrouter},
+    Zustand~\cite{zustand} and Framer Motion~\cite{framermotion}, charts
+    on D3 scales~\cite{bostock2011}, equations in KaTeX~\cite{katex},
+    built with Vite~\cite{vite}. It ships a TypeScript copy of the
     models, solvers and gold standard, so the Model Lab, Solver Arena
     and Stability pages recompute in the browser. The other pages load
-    the precomputed results. A parity test (9 cases, passing) checks the
-    TypeScript code against Python-generated fixtures: solver states to
-    $10^{-9}$ and the gold standard to $10^{-6}$.
+    the precomputed results. A Vitest~\cite{vitest} parity test (9 cases,
+    passing) checks the TypeScript code against Python-generated
+    fixtures: solver states to $10^{-9}$ and the gold standard to
+    $10^{-6}$.
 \end{itemize}
-Each run records its config hash, seed and output path in
-\path{results/manifest.json}, and a run is skipped when its config is
-unchanged. The figures in this report are drawn from the result files by
-\path{report/make_report_figures.py} with
-matplotlib~\cite{hunter2007}.
+Each run records its config hash, git commit, library version, seed,
+wall time and host in \path{results/manifest.json}, and a run is skipped
+when its config is unchanged. The figures in this report are drawn from
+the result files by \path{report/make_report_figures.py} with
+matplotlib~\cite{hunter2007}, and the report uses the ACM \texttt{acmart}
+template~\cite{acmart}.
 
-\subsection{Model and parameter choices}
+\subsection{Simulation setup and parameter choices}
 Unless stated otherwise, every experiment uses the following setup
 (from \path{configs/}):
 \begin{itemize}
@@ -645,61 +670,65 @@ to very noisy data.
 \subsection{Experiments}
 The repository defines 14 experiments, E01--E14
 (\path{experiments/registry.py}). Table~\ref{tab:exp} lists them by
-research question, with their registry names. Each config defines a
-\texttt{quick} profile, which runs all 14 experiments in about 17
-minutes with 8 worker processes on a laptop, and a \texttt{full}
-profile at the scale of the original plan (for example about
-$1.9\times10^6$ fits for E07). \emph{All numbers in this report come
-from the \texttt{quick} profile.}
+research question, with their registry names and wall-clock times. Each
+config defines a \texttt{quick} profile and a \texttt{full} profile at
+the scale of the original plan (for example about $1.9\times10^6$ fits
+for E07). The \texttt{quick} profile runs all 14 experiments in
+1{,}014~s (about 17 minutes) with 8 worker processes on a laptop. The
+solver studies take seconds; the replicated fitting experiments take
+1--5 minutes each. \emph{All numbers in this report come from the
+\texttt{quick} profile.}
 
 \begin{table*}[t]
   \centering
   \footnotesize
-  \caption{The experiment registry, quick-profile sizes. ``Fits'' are
-    complete Levenberg--Marquardt estimations.}
+  \caption{The experiment registry: quick-profile sizes and wall-clock
+    times (8 worker processes). ``Fits'' are complete
+    Levenberg--Marquardt estimations.}
   \label{tab:exp}
-  \begin{tabularx}{\textwidth}{@{}l l l X X@{}}
+  \begin{tabularx}{\textwidth}{@{}l l l X X r@{}}
     \toprule
-    ID & Registry name & RQ & What it measures & Design (quick profile)\\
+    ID & Registry name & RQ & What it measures & Design (quick profile) & Time (s)\\
     \midrule
     E01 & Convergence \& order & 1 & Observed order vs.\ the gold standard &
       5 solvers $\times$ $h\in\{1,\tfrac12,\tfrac14,\tfrac18\}$ $\times$ 3
-      regimes ($\mathcal R_0=1.5,3,6$), $t\in[0,40]$\\
+      regimes ($\mathcal R_0=1.5,3,6$), $t\in[0,40]$ & 1.1\\
     E02 & Invariant drift & 1 & Mass error vs.\ phase-invariant drift &
-      Euler/Heun/RK4 $\times$ $h\in\{2,0.5,0.1\}$, $t\in[0,60]$\\
+      Euler/Heun/RK4 $\times$ $h\in\{2,0.5,0.1\}$, $t\in[0,60]$ & 0.1\\
     E03 & Stability frontier & 1 & Largest stable $h$; $h\rho(J)$ there &
       $15\times15$ $(\beta,\gamma)$ grid $\times$ 3 solvers $\times$
-      $h\in\{0.5,\dots,16\}$\\
+      $h\in\{0.5,\dots,16\}$ & 9.0\\
     E04 & Structural accuracy & 1 & Errors in peak height/time, final size &
-      3 solvers $\times$ $h\in\{2,1,0.5,0.25\}$\\
+      3 solvers $\times$ $h\in\{2,1,0.5,0.25\}$ & 0.2\\
     E05 & Cost landscape & 3 & $J(\beta,\gamma)$, valley axis,
-      $\kappa(J_r^\top J_r)$ & $30\times30$ grid, 3 noise levels\\
+      $\kappa(J_r^\top J_r)$ & $30\times30$ grid, 3 noise levels & 59.8\\
     E06 & Optimizer shoot-out & 3 & Success and cost of 5 optimizers &
-      8 random starts, one data set ($\sigma_{\mathrm{frac}}=0.05$)\\
+      8 random starts, one data set ($\sigma_{\mathrm{frac}}=0.05$) & 161.6\\
     E07 & Solver-in-the-loop recovery & 2 & Solver-induced bias in
       $\hat\theta$ & 3 solvers $\times$ $h\in\{0.25,0.05\}$ $\times$
       $\sigma_{\mathrm{frac}}\in\{0,0.02,0.1\}$ $\times$
-      $\Delta t\in\{1,3\}$ $\times$ 2 regimes $\times$ 10 reps $=$ 720 fits\\
+      $\Delta t\in\{1,3\}$ $\times$ 2 regimes $\times$ 10 reps $=$ 720 fits
+      & 92.5\\
     E08 & Noise degradation & 3 & RMSE vs.\ noise, bootstrap CI &
-      RK4 $h=0.05$, 4 noise levels $\times$ 30 reps\\
+      RK4 $h=0.05$, 4 noise levels $\times$ 30 reps & 46.8\\
     E09 & Sampling \& window & 3 & Effect of $\Delta t$ and window length &
-      $\Delta t\in\{0.5,1,2\}$ $\times$ 3 windows $\times$ 20 reps\\
+      $\Delta t\in\{0.5,1,2\}$ $\times$ 3 windows $\times$ 20 reps & 271.2\\
     E10 & Initial conditions & 3 & Unknown $I_0$ as a third parameter &
-      $I_0\in\{1,5,20\}$ $\times$ 10 reps\\
+      $I_0\in\{1,5,20\}$ $\times$ 10 reps & 131.7\\
     E11 & Uncertainty quantification & 3 & Four UQ methods, profile
-      likelihood & 60 bootstrap, 60 Monte Carlo, $4\times200$ MCMC\\
+      likelihood & 60 bootstrap, 60 Monte Carlo, $4\times200$ MCMC & 186.7\\
     E12 & Model variants & 4 & Orders on SEIR, SIRS, SIR-V &
-      4 models $\times$ 3 solvers $\times$ 4 steps; RK45 as truth\\
+      4 models $\times$ 3 solvers $\times$ 4 steps; RK45 as truth & 0.6\\
     E13 & Crossover sigma* & 2+3 & Crossover $\sigma^*(h)$ for Euler &
       $h\in\{0.1,0.25,0.5\}$ $\times$ (3 bias fits $+$ 6 noise levels
-      $\times$ 25 reps) $=$ 459 fits\\
+      $\times$ 25 reps) $=$ 459 fits & 50.6\\
     E14 & Real data & 4 & Fit to the Eyam 1666 outbreak &
-      RK4 and Euler ($h=0.1$), 8 counts\\
+      RK4 and Euler ($h=0.1$), 8 counts & 2.2\\
     \bottomrule
   \end{tabularx}
 \end{table*}
 
-\subsection{Datasets}
+\subsection{Datasets and benchmarks}
 \textbf{Synthetic data.} The recovery, noise, sampling,
 initial-condition and crossover experiments (E07--E10, E13) generate
 data from the \emph{gold standard}, so the data contain no
@@ -710,19 +739,23 @@ being fitted is deliberate: it isolates solver and noise error from
 model misspecification, and it is the design Capaldi et al.\ use.
 
 \textbf{Real data.} The real-data experiment (E14) uses the 1666 plague
-outbreak in Eyam, Derbyshire~\cite{raggett1982}: $N=261$ and $I_0=7$,
-with susceptible counts on 8 dates, every 14 days from 19~June to
-25~September~1666 (\path{data/raw/eyam_1666.csv}). The digitized
-values have not yet been checked against the primary source
-(\path{data/raw/provenance.md}), so we treat this fit as a
-demonstration rather than a validated estimate.
+outbreak in Eyam, Derbyshire, a village that isolated itself during the
+outbreak. Raggett~\cite{raggett1982} reconstructed the susceptible and
+infective counts from the parish death records, at 0, 0.5, 1, 1.5, 2,
+2.5, 3 and 4 months after 18~June~1666 (the last on 20~October). We use
+his table as reproduced, identically, by Ho et
+al.~\cite{ho2017} and by Golightly and Sherlock~\cite{golightly2019}
+(\path{data/raw/eyam_1666.csv}). We convert months to days
+($\times365.25/12$) and fit the 8 susceptible counts, with $N=261$
+($S+I$ on 18~June) and $I_0=7$.
 
 \textbf{Benchmarks.} The benchmarks are:
 \begin{itemize}
   \item the gold standard, with the closed forms for $I_{\max}$ and
     $S_\infty$, for solver accuracy;
   \item textbook orders and stability limits, for RQ1;
-  \item Capaldi et al.'s identifiability results, for RQ3.
+  \item Capaldi et al.'s identifiability results, for RQ3;
+  \item Raggett's own estimate for the Eyam outbreak, for RQ4.
 \end{itemize}
 
 \subsection{One fit, traced through the code}
@@ -755,7 +788,7 @@ performs 459 such fits.
 \end{table}
 
 %% =====================================================================
-\section{Results and Discussion}
+\section{Results \& Discussion}
 \label{sec:results}
 %% =====================================================================
 \emph{All numbers come from the \texttt{quick} profile, and rerunning the
@@ -798,6 +831,7 @@ buys accuracy far more cheaply than a smaller step.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/convergence.pdf}
+  \Description{Log-log plot of global error against step size for five solvers; the lines have slopes matching orders 1, 2 and 4.}
   \caption{Global error against the gold standard in the reference
     regime (E01). Each slope matches its method's order.}
   \label{fig:conv}
@@ -821,6 +855,7 @@ The invariant $Q(t)$ costs nothing extra and does detect the error.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/invariants.pdf}
+  \Description{Two log-log panels. Mass error stays near 1e-12 for every solver and step size, while phase-invariant drift falls with the step size at each solver's order.}
   \caption{(a) Mass conservation holds to round-off at every $h$, so it
     cannot detect a wrong solution. (b) Drift in the phase invariant
     $Q=\ln S+kR$ separates the solvers by order (E02).}
@@ -868,6 +903,7 @@ $23.5$ and $583$.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/bias_vs_h.pdf}
+  \Description{Log-log plot of the bias in the fitted beta against the fitting step size for Euler, Heun and RK4, following slopes 1, 2 and 4.}
   \caption{Bias of $\hat\beta$ when fitting exact (noise-free) data,
     against the fitting solver's step size. Dotted guides show slopes
     $h^1$, $h^2$ and $h^4$.}
@@ -898,14 +934,16 @@ Three further observations follow.
     \emph{overestimate} both parameters. Euler at $h=0.25$ is $1.5\%$
     high in $\beta$ and $1.4\%$ high in $\gamma$, and at $h=1$ it is
     $6\%$ high in $\beta$ ($\hat\beta=0.318$, $\hat\gamma=0.106$).
-  \item \textbf{$\mathcal R_0$ is much less affected.} Because $\beta$
-    and $\gamma$ err in the same direction, their ratio is protected: at
+  \item \textbf{$\mathcal R_0$ is much less affected.} At
     $\mathcal R_0=3$, Euler at $h=0.25$ is only $0.10\%$ off in
-    $\hat{\mathcal R}_0$, and at $h=1$ only $0.27\%$. The cost valley
-    runs along the $\beta/\gamma$ direction, so the solver mostly pushes
-    the estimate \emph{along} the valley. The protection is weaker at
-    $(0.6,0.15)$, where Euler at $h=0.25$ is $3.0\%$ off in $\beta$,
-    $1.8\%$ off in $\gamma$, and $1.2\%$ off in $\mathcal R_0$.
+    $\hat{\mathcal R}_0$, and at $h=1$ only $0.27\%$. The bias vector
+    $(4.48,1.40)\times10^{-3}$ points $17^\circ$ from the $\beta$ axis,
+    almost exactly along the line of constant $\mathcal R_0$ through the
+    truth ($18^\circ$), so the solver moves the estimate along that line
+    and the errors in $\beta$ and $\gamma$ cancel in their ratio. The
+    cancellation is weaker at $(0.6,0.15)$, where Euler at $h=0.25$ is
+    $3.0\%$ off in $\beta$, $1.8\%$ off in $\gamma$, and $1.2\%$ off in
+    $\mathcal R_0$.
   \item \textbf{The data hardly matter.} Changing the sampling interval
     from $\Delta t=1$ to $3$ changes the bias by less than 2\%. The bias
     belongs to the forward model, not to the data. Because the Jacobian
@@ -939,17 +977,21 @@ method with deflation) are $1.21\times10^8$ and $2.38\times10^7$. That
 gives $\kappa_2(J_r^\top J_r)=5.1$, with the shallow valley along
 $(0.86,0.51)$ in the $(\beta,\gamma)$ plane. This is the same order as
 the base paper's $\kappa=5.2$ for a $(\beta,\gamma)$ fit at
-$\mathcal R_0=3$~\cite{capaldi2012}. From 8 random starts in
-$[0.05,1]\times[0.02,0.5]$:
+$\mathcal R_0=3$~\cite{capaldi2012}. We started each optimizer from 8
+random points in $[0.05,1]\times[0.02,0.5]$ and counted a run as a
+success if it met its own stopping test and ended within 2\% of the
+truth:
 \begin{itemize}
-  \item Levenberg--Marquardt converged every time, in 8.5 iterations and
+  \item Levenberg--Marquardt succeeded every time, in 8.5 iterations and
     19.8 function evaluations on average;
-  \item Nelder--Mead also always converged, but needed 111 evaluations;
+  \item Nelder--Mead also always succeeded, but needed 111 evaluations;
   \item Gauss--Newton failed from 2 of 8 starts in linear coordinates,
     and from 1 of 8 in log coordinates;
-  \item golden-section coordinate descent never reached the 2\%
-    tolerance within 10 sweeps, because searches along the axes zig-zag
-    in a tilted valley.
+  \item golden-section coordinate descent ended within 2\% of the truth
+    from every start, but never met its stopping test within its 10
+    sweeps. From half the starts it was still short of the
+    least-squares minimum, moving along the tilted valley one axis at a
+    time.
 \end{itemize}
 This is why Levenberg--Marquardt is the estimator everywhere else.
 
@@ -981,6 +1023,7 @@ the shortest window doubles the error, to $3.0\times10^{-3}$.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/noise_sampling.pdf}
+  \Description{Left: RMSE of the fitted beta rising linearly with the noise level, with a bootstrap band. Right: RMSE against observation window for three sampling intervals.}
   \caption{(a) RMSE$(\hat\beta)$ grows linearly with noise (E08; 30
     replicates; bootstrap CI). (b) RMSE against observation window and
     sampling interval (E09; 20 replicates per cell).}
@@ -1024,6 +1067,7 @@ rate $\beta-\gamma$, but not $\beta$ and $\gamma$ separately.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/uq.pdf}
+  \Description{Left: confidence ellipse, bootstrap points and MCMC samples around the true parameters. Right: profile likelihood, sharply curved for the full window and flat for a pre-peak window.}
   \caption{(a) Asymptotic ellipse, bootstrap cloud and MCMC samples for
     one data set (E11). (b) Profile likelihood on the full window and on
     a pre-peak window; the flat curve signals non-identifiability.}
@@ -1062,6 +1106,7 @@ make the decomposition \eqref{eq:mse} clean:
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/crossover.pdf}
+  \Description{Log-log plot of the noise-induced spread of the fitted beta against noise level for three Euler step sizes, crossing horizontal solver-bias lines at the marked crossover levels.}
   \caption{The crossover for Euler (E13). Dashed lines: the solver bias
     at each $h$. Solid curves: the Monte Carlo spread over 25 noisy data
     sets. Stars mark $\sigma^*$, where the two are equal. Left of a star
@@ -1075,27 +1120,28 @@ $\sigma^*=0.058$ at $h=0.1$ and $0.156$ at $h=0.25$. At $h=0.5$ the bias
 still exceeds the spread at the largest noise level tested
 ($\sigma_{\mathrm{frac}}=0.2$), so there $\sigma^*>0.2$.
 
-The scaling law \eqref{eq:sigmastar} predicts these values well. Fitting
-$s\approx K\sigma$ gives $K\approx0.031$, and $\sigma^*\approx|b(h)|/K$
-then predicts $0.058$, $0.145$ and $0.29$. The first matches exactly,
-the second is within 7\%, and the third is consistent with the measured
-bound. For $\hat\gamma$ the crossover comes earlier ($0.029$, $0.054$ and
-$0.128$), because $\gamma$'s bias is smaller relative to its spread.
+The scaling law \eqref{eq:sigmastar} predicts these values well. A
+least-squares fit of $s=K\sigma$ through the origin, over all 18 noisy
+cells, gives $K=0.033$, and $\sigma^*\approx|b(h)|/K$ then predicts
+$0.055$, $0.137$ and $0.28$. These are within 5\% and 12\% of the first
+two measured values, and consistent with the bound on the third. For
+$\hat\gamma$ the crossover comes earlier ($0.029$, $0.054$ and $0.128$),
+because $\gamma$'s bias is smaller relative to its spread.
 
 \begin{table}[t]
   \centering
   \footnotesize
   \caption{Crossover noise levels $\sigma^*$ for Euler (E13), as a
-    fraction of peak prevalence. ``Predicted'' is $|b|/K$, with $K=0.031$
-    fitted from the spread.}
+    fraction of peak prevalence. ``Predicted'' is $|b|/K$, with $K=0.033$
+    the least-squares slope of the spread against $\sigma$.}
   \label{tab:cross}
   \begin{tabular}{@{}cccccc@{}}
     \toprule
     $h$ & $|b_\beta(h)|$ & $\sigma^*_\beta$ & predicted & $|b_\gamma(h)|$ & $\sigma^*_\gamma$\\
     \midrule
-    0.10 & $1.79\times10^{-3}$ & 0.058 & 0.058 & $5.5\times10^{-4}$ & 0.029\\
-    0.25 & $4.48\times10^{-3}$ & 0.156 & 0.145 & $1.4\times10^{-3}$ & 0.054\\
-    0.50 & $9.02\times10^{-3}$ & $>0.2$ & 0.29 & $2.8\times10^{-3}$ & 0.128\\
+    0.10 & $1.79\times10^{-3}$ & 0.058 & 0.055 & $5.5\times10^{-4}$ & 0.029\\
+    0.25 & $4.48\times10^{-3}$ & 0.156 & 0.137 & $1.4\times10^{-3}$ & 0.054\\
+    0.50 & $9.02\times10^{-3}$ & $>0.2$ & 0.28 & $2.8\times10^{-3}$ & 0.128\\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1126,29 +1172,36 @@ $1.95$ and $1.95$ for Heun; and $3.99$, $3.93$ and $3.94$ for RK4. The
 ordering, and with it the mechanism behind RQ2, is not specific to the
 plain SIR structure.
 
-\paragraph{Eyam 1666 (E14).} Fitting $S(t)$ to the 8 counts
-(Figure~\ref{fig:eyam}) gives:
-\begin{itemize}
-  \item \textbf{RK4:} $\hat\beta=0.157\pm0.006$ and
-    $\hat\gamma=0.094\pm0.005$ per day, so $\hat{\mathcal R}_0=1.67$;
-  \item \textbf{Euler:} $\hat\beta=0.158$ and $\hat\gamma=0.095$, so
-    $\hat{\mathcal R}_0=1.66$.
-\end{itemize}
-The two solvers differ by 0.2\% in $\hat\beta$, about $1/18$ of a
-standard error. The residuals are about $\pm4$ people, roughly $1.5\%$
-of $N$, on only 8 points, so this data set lies far inside the
-noise-dominated regime. Solver choice is irrelevant here, just as
-\eqref{eq:sigmastar} predicts. The correlation
-$\rho(\hat\beta,\hat\gamma)=0.986$ is close to 1, matching the
-near-threshold behaviour Capaldi et al.\ report for $\mathcal R_0=1.2$
-($\rho=0.98$): $\mathcal R_0$ is pinned down far better than $\beta$ or
-$\gamma$ alone.
+\paragraph{Eyam 1666 (E14).} Fitting $S(t)$ to the 8 susceptible
+counts (Figure~\ref{fig:eyam}) with RK4 gives $\hat\beta=0.147\pm0.005$
+and $\hat\gamma=0.089\pm0.005$ per day, so $\hat{\mathcal R}_0=1.65$ and
+a mean infectious period $1/\hat\gamma$ of 11 days. Euler gives the same
+values to three significant figures ($\hat{\mathcal R}_0=1.646$ against
+$1.648$), a difference of 0.18\% in $\hat\beta$, or $1/20$ of a
+standard error. The residuals reach $\pm4.6$ people (1.8\% of $N$) on
+only 8 points, so this data set lies far inside the noise-dominated
+regime, and solver choice is irrelevant there, just as
+\eqref{eq:sigmastar} predicts.
+
+\textbf{Comparison with the original study.} Raggett fitted a
+stochastic SIR model to both the susceptible and the infective counts,
+and estimated a removal rate $\hat\alpha=3.39$ and an infection rate
+$\hat\beta_{\mathrm R}=0.0212$ per susceptible--infective pair, both
+per month~\cite{raggett1982,ho2017}. In our parameterization
+($\gamma=\alpha$, $\beta=\beta_{\mathrm R}N$) these are $0.111$ and
+$0.182$ per day, so $\mathcal R_0=1.63$. Our $\hat{\mathcal R}_0=1.65$
+agrees within 1\%, while our individual rates are about 20\% lower.
+That is exactly the pattern the correlation predicts:
+$\rho(\hat\beta,\hat\gamma)=0.985$, close to 1, as in the near-threshold
+case of Capaldi et al.\ ($\mathcal R_0=1.2$, $\rho=0.98$). The data pin
+down $\mathcal R_0$ far better than $\beta$ or $\gamma$ alone.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/eyam.pdf}
-  \caption{Eyam 1666 susceptible counts with the RK4 and Euler fits
-    (E14), which are visually indistinguishable.}
+  \Description{Eight observed susceptible counts from Eyam, falling from 254 to 83 over four months, with nearly identical RK4 and Euler fitted curves.}
+  \caption{Eyam 1666 susceptible counts~\cite{raggett1982} with the RK4
+    and Euler fits (E14), which are visually indistinguishable.}
   \label{fig:eyam}
 \end{figure}
 
@@ -1164,7 +1217,7 @@ findings:
   \item the information is concentrated up to and around the peak, and
     pre-peak data leave $\beta$ and $\gamma$ unidentifiable;
   \item near threshold the two estimates are strongly correlated (Eyam,
-    $\rho=0.986$).
+    $\rho=0.985$).
 \end{itemize}
 One quantitative difference is instructive. In our reference regime
 $\rho=0.64$, while Capaldi et al.\ report $\rho=0.11$ at
@@ -1189,7 +1242,7 @@ answer.} Both ``always use RK4'' and ``the solver never matters'' are
 wrong as general statements. A low-order solver biases the estimate by
 an amount set by $h^p$, and that bias competes with a noise spread set by
 $\sigma$. The boundary $\sigma^*\propto h^p$ can be measured, and a
-simple linear argument predicts it to within about 10\%. For a
+simple linear argument predicts it to within about 12\%. For a
 practitioner this gives a rule: \emph{estimate the noise level, then
 choose $h$ and $p$ so that $\sigma^*(h)$ lies well below it.} With RK4,
 any $h\le0.5$ day is enough. With Euler, $h=0.1$ is safe only when the
@@ -1208,7 +1261,7 @@ solver-free truth: a ``finer numerical solve'' used as the reference
 would hide part of $b(h)$.
 
 %% =====================================================================
-\section{Conclusion and Future Work}
+\section{Conclusion \& Future Work}
 \label{sec:conclusion}
 %% =====================================================================
 \subsection{Key takeaways}
@@ -1232,8 +1285,12 @@ would hide part of $b(h)$.
     is $0.058$ at $h=0.1$ and $0.156$ at $h=0.25$, in line with
     $\sigma^*\approx|b(h)|/K\propto h^p$.
   \item \textbf{RQ4.} The ordering holds on SEIR, SIRS and SIR-V. On the
-    Eyam data, which are noise-dominated, solver choice is irrelevant.
+    Eyam data, which are noise-dominated, solver choice is irrelevant,
+    and $\hat{\mathcal R}_0=1.65$ agrees with the original study's
+    estimate within 1\%.
 \end{enumerate}
+All code, data, experiment configurations and results are public at
+\repo.
 
 \subsection{Limitations}
 \begin{itemize}
@@ -1250,8 +1307,10 @@ would hide part of $b(h)$.
     use data generated from the model being fitted, with additive
     Gaussian noise ($\xi=0$). This isolates solver error but says
     nothing about model misspecification.
-  \item \textbf{Real-data provenance.} The Eyam counts have not been
-    verified against the primary source.
+  \item \textbf{One simple real-data fit.} The Eyam fit uses a
+    deterministic model and only the susceptible counts, and the counts
+    come from published reproductions of Raggett's table rather than
+    from his paper directly.
   \item \textbf{Small, non-stiff models.} All the models tested are
     small and non-stiff, so the implicit solvers' stability advantages
     never come into play.
@@ -1270,8 +1329,8 @@ would hide part of $b(h)$.
   \item Add model misspecification as a third error source, for example
     fitting SIR to SEIR-generated data, and map where each of the three
     sources dominates.
-  \item Verify the Eyam data against Raggett (1982), and fit further
-    historical outbreaks.
+  \item Fit the Eyam infective counts as well, with a stochastic SIR
+    model as Raggett did, and fit further historical outbreaks.
 \end{itemize}
 
 %% ---------------------------------------------------------------------
@@ -1279,20 +1338,5 @@ would hide part of $b(h)$.
 %% ---------------------------------------------------------------------
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}
-
-\appendix
-
-\section{Reproducing this report}
-\begin{verbatim}
-git clone https://github.com/g-schatten/CSE402-Project
-cd CSE402-Project && pip install -e ".[dev]"
-python -m experiments.runner --all --profile quick
-python report/make_report_figures.py
-pytest tests/ -q                 # 82 tests
-cd web && npm ci && npx vitest run   # parity
-\end{verbatim}
-Seeds are fixed per experiment ($s_0=k$ for E$k$), and replicates are
-seeded by \eqref{eq:seed}, so a rerun reproduces every number exactly.
-Use \texttt{--profile full} for the paper-scale runs.
 
 \end{document}

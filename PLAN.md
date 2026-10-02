@@ -313,7 +313,7 @@ CSE402-Project/
 │   └── tests/parity.test.ts     TS ↔ Python golden-fixture agreement
 │
 ├── report/           B_02.tex (ACM sigconf), refs.bib, figures/, make_report_figures.py
-└── deck/             final presentation
+└── presentations/    proposal, final presentation, supervisor slides
 ```
 
 **Hard rule:** `core/sirlab` never imports matplotlib, never writes files, never reads configs.
@@ -574,7 +574,7 @@ figure should be impossible.
 Matplotlib style file shared with the web palette so the report and the dashboard are visibly
 the same project. PDF/vector output, Type 1 fonts, no rasterised text.
 
-**Deck** (`deck/`): ~15 slides, same palette, built around a live demo of the dashboard rather
+**Deck** (`presentations/final/`): ~15 slides, same palette, built around a live demo of the dashboard rather
 than screenshots of it. Structure: hook (the crossover claim) → the gap in the base paper →
 method in one slide → live demo → three results → limitations → conclusion. Screenshots go in
 the backup slides in case the projector fights us.

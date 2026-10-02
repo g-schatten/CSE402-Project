@@ -5,6 +5,7 @@ __pycache__/
 *.egg-info/
 core/sirlab.egg-info/
 .pytest_cache/
+.hypothesis/
 .ipynb_checkpoints/
 
 # Node / web
@@ -19,16 +20,22 @@ web/public/data/*.json
 figures/*.pdf
 figures/*.svg
 
-# LaTeX build artifacts
-report/*.aux
+# LaTeX build artifacts (report/ and presentations/supervisor/)
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+*.nav
+*.snm
+*.toc
+*.vrb
 report/*.log
 report/*.out
-report/*.bbl
-report/*.blg
-report/*.fls
-report/*.fdb_latexmk
-report/*.synctex.gz
-report/*.xdv
+presentations/supervisor/*.log
+presentations/supervisor/*.out
 # local Overleaf upload bundle and preview builds
 report/*.zip
 report/B_02_preview.pdf

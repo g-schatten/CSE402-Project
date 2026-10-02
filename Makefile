@@ -1,4 +1,4 @@
-.PHONY: setup core experiments experiment figures quicklook fixtures web web-build web-test report deck all clean test
+.PHONY: setup core experiments experiment figures quicklook fixtures web web-build web-test report slides all clean test
 
 PY := . .venv/bin/activate &&
 PROFILE ?= quick
@@ -51,8 +51,9 @@ web-build:
 report: figures
 	cd report && latexmk -pdf B_02.tex
 
-deck:
-	@echo "Presentation: deck/presentation.pptx (outline in deck/OUTLINE.md)"
+# Figures for the supervisor slides (presentations/supervisor/figures/)
+slides:
+	$(PY) python presentations/supervisor/make_figures.py
 
 all: setup core experiments web-test figures
 

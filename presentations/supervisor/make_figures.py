@@ -1,10 +1,10 @@
-"""Figures for the supervisor slides (supervisor_slides/slides.tex).
+"""Figures for the supervisor slides (presentations/supervisor/slides.tex).
 
 Everything is recomputed from the project's own code (core/sirlab and the
 experiment modules, quick profile), so the slide numbers match the report.
 Run from the repository root:
 
-    python supervisor_slides/make_figures.py
+    python presentations/supervisor/make_figures.py
 """
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "core"))
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
