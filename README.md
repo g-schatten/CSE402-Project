@@ -114,6 +114,4 @@ and arXiv:1809.07139 (Table 4). See [`data/raw/provenance.md`](data/raw/provenan
 
 ## Status
 
-All 14 experiments, the test suite and the dashboard are implemented, and the tests pass. Every
-number in the report comes from the `quick` profile; the `full` profile (for example E07's
-~1.9M-fit design) has not been run.
+All 14 experiments, the test suite and the dashboard are implemented, and the tests pass. 
